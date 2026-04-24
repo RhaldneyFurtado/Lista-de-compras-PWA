@@ -3,6 +3,8 @@ import react from "@vitejs/plugin-react"; // Plugin React
 import { VitePWA } from "vite-plugin-pwa"; // Plugin PWA
 
 export default defineConfig({
+  base: "/Lista-de-compras-PWA/", // ESSENCIAL para GitHub Pages funcionar (caminho do repositório)
+
   plugins: [
     react(), // Ativa suporte ao React
 
@@ -22,16 +24,16 @@ export default defineConfig({
         theme_color: "#10b981",
         background_color: "#ffffff",
         display: "standalone",
-        start_url: "/",
+        start_url: "/Lista-de-compras-PWA/", //ATUALIZADO com o base para GitHub Pages
 
         icons: [
           {
-            src: "/pwa-192x192.png",
+            src: "/Lista-de-compras-PWA/pwa-192x192.png", // ATUALIZADO com o base
             sizes: "192x192",
             type: "image/png",
           },
           {
-            src: "/pwa-512x512.png",
+            src: "/Lista-de-compras-PWA/pwa-512x512.png", // ATUALIZADO com o base
             sizes: "512x512",
             type: "image/png",
             purpose: "any maskable", // Melhor adaptação no Android
@@ -54,5 +56,6 @@ export default defineConfig({
 
   build: {
     sourcemap: true, // Ajuda a debugar produção
+    outDir: "dist", // Pasta de saída do build (padrão do Vite)
   },
 });

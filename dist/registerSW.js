@@ -1,0 +1,1 @@
+if('serviceWorker' in navigator) {window.addEventListener('load', () => {navigator.serviceWorker.register('/Lista-de-compras-PWA/sw.js', { scope: '/Lista-de-compras-PWA/' })})}
