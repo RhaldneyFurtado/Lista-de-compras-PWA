@@ -1,5 +1,3 @@
-Lista de Compras — PWA
-Uma aplicação web progressiva (PWA) para gerenciamento de listas de compras, desenvolvida com foco em simplicidade, acessibilidade e funcionamento offline.
 
 Funcionalidades
 Adicionar itens à lista com nome, quantidade e categoria
