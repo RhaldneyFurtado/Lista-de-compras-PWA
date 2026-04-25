@@ -1,44 +1,94 @@
-import { defineConfig } from "vite"; // Função de configuração do Vite
-import react from "@vitejs/plugin-react"; // Plugin React
-import { VitePWA } from "vite-plugin-pwa"; // Plugin PWA
+// ==============================
+// Importações principais do Vite
+// ==============================
+import { defineConfig } from "vite"; // Função que define a configuração do Vite
+import react from "@vitejs/plugin-react"; // Plugin para suporte ao React
+import { VitePWA } from "vite-plugin-pwa"; // Plugin para transformar o app em PWA
 
+// ==============================
+// CONFIGURAÇÃO PRINCIPAL
+// ==============================
 export default defineConfig({
-  base: "/Lista-de-compras-PWA/", // ESSENCIAL para GitHub Pages funcionar (caminho do repositório)
+  // ==============================
+  // Base obrigatória no GitHub Pages
+  // ==============================
+  base: "/Lista-de-compras-PWA/", // Caminho do repositório no GitHub Pages
 
+  // ==============================
+  // PLUGINS DO PROJETO
+  // ==============================
   plugins: [
-    react(), // Ativa suporte ao React
+    // React funcionando no Vite
+    react(),
 
+    // ==============================
+    // CONFIGURAÇÃO DO PWA
+    // ==============================
     VitePWA({
-      registerType: "autoUpdate", // Atualiza automaticamente o service worker
+      // ==============================
+      // ATUALIZAÇÃO DO SERVICE WORKER
+      // ==============================
+      registerType: "prompt",
+      // 👉 Em vez de autoUpdate:
+      // mostra atualização e evita cache preso (mais confiável no GitHub Pages)
 
-      // Estratégia de cache (Workbox)
+      // ==============================
+      // WORKBOX (CACHE DO PWA)
+      // ==============================
       workbox: {
         globPatterns: ["**/*.{js,css,html,ico,png,svg}"],
+
+        // 🔥 força o novo service worker assumir imediatamente
+        skipWaiting: true,
+        clientsClaim: true,
       },
 
-      // Manifesto do app (PWA)
+      // ==============================
+      // MANIFESTO DO PWA (INSTALAÇÃO)
+      // ==============================
       manifest: {
+        // Nome completo do app
         name: "Lista de Compras Inteligente",
-        short_name: "Compras",
-        description: "Organize suas compras de forma simples e offline",
-        theme_color: "#10b981",
-        background_color: "#ffffff",
-        display: "standalone",
-        start_url: "/Lista-de-compras-PWA/", //ATUALIZADO com o base para GitHub Pages
 
+        // Nome curto (aparece no ícone do celular)
+        short_name: "Compras",
+
+        // Descrição do app
+        description: "Organize suas compras de forma simples e offline",
+
+        // Cor da barra do navegador no mobile
+        theme_color: "#10b981",
+
+        // Cor de fundo ao abrir o app
+        background_color: "#ffffff",
+
+        // Modo de exibição como app nativo
+        display: "standalone",
+
+        // URL inicial do app (IMPORTANTE no GitHub Pages)
+        start_url: "/Lista-de-compras-PWA/",
+
+        // ==============================
+        // ÍCONES DO APP (INSTALAÇÃO NO CELULAR)
+        // ==============================
         icons: [
           {
-            src: "pwa-192x192.png",
+            // Ícone padrão 192x192
+            src: "/Lista-de-compras-PWA/pwa-192x192.png",
             sizes: "192x192",
             type: "image/png",
           },
+
           {
-            src: "pwa-512x512.png",
+            // Ícone grande 512x512
+            src: "/Lista-de-compras-PWA/pwa-512x512.png",
             sizes: "512x512",
             type: "image/png",
           },
+
           {
-            src: "maskable-icon-512x512.png",
+            // Ícone adaptável (Android moderno)
+            src: "/Lista-de-compras-PWA/maskable-icon-512x512.png",
             sizes: "512x512",
             type: "image/png",
             purpose: "maskable",
@@ -46,21 +96,29 @@ export default defineConfig({
         ],
       },
 
-      // ESSENCIAL PRA FUNCIONAR EM DEV
+      // ==============================
+      // CONFIGURAÇÃO DE DESENVOLVIMENTO
+      // ==============================
       devOptions: {
-        enabled: true,
+        enabled: true, // permite testar PWA localmente no dev
       },
     }),
   ],
 
+  // ==============================
+  // SERVIDOR LOCAL (DEV)
+  // ==============================
   server: {
-    host: true, // Permite acessar pelo celular (mesma rede)
-    port: 5173,
-    open: true, // Abre no navegador automaticamente
+    host: true, // permite acessar pelo celular na mesma rede
+    port: 5173, // porta padrão do Vite
+    open: true, // abre o navegador automaticamente
   },
 
+  // ==============================
+  // BUILD DE PRODUÇÃO
+  // ==============================
   build: {
-    sourcemap: true, // Ajuda a debugar produção
-    outDir: "dist", // Pasta de saída do build (padrão do Vite)
+    sourcemap: true, // ajuda a debugar erros em produção
+    outDir: "dist", // pasta final do build
   },
 });
