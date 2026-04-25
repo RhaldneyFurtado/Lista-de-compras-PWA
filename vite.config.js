@@ -28,15 +28,20 @@ export default defineConfig({
 
         icons: [
           {
-            src: "/Lista-de-compras-PWA/pwa-192x192.png", // ATUALIZADO com o base
+            src: "pwa-192x192.png",
             sizes: "192x192",
             type: "image/png",
           },
           {
-            src: "/Lista-de-compras-PWA/pwa-512x512.png", // ATUALIZADO com o base
+            src: "pwa-512x512.png",
             sizes: "512x512",
             type: "image/png",
-            purpose: "any maskable", // Melhor adaptação no Android
+          },
+          {
+            src: "pwa-512x512.png",
+            sizes: "512x512",
+            type: "image/png",
+            purpose: "maskable",
           },
         ],
       },
