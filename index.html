@@ -1,43 +1,41 @@
 <!doctype html>
 <html lang="pt-BR">
   <head>
-    <!-- Importando as imagens -->
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
-    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+
+    <!-- Ícones -->
+    <link rel="icon" type="image/x-icon" href="./favicon.ico" />
+    <link rel="apple-touch-icon" href="./apple-touch-icon.png" />
+    <link rel="manifest" href="./manifest.webmanifest" />
+
+    <!-- Manifesto PWA -->
+    <link rel="manifest" href="./manifest.webmanifest" />
 
     <!-- Responsividade -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <!-- Cor da barra no mobile -->
+    <!-- Cor do tema -->
     <meta name="theme-color" content="#10b981" />
 
-    <!-- SEO básico -->
+    <!-- SEO -->
     <meta
       name="description"
       content="Lista de compras inteligente - organize suas compras de forma simples e rápida"
     />
 
-    <!-- Nome do app (PWA / iOS) -->
+    <!-- Nome do aplicativo -->
     <meta name="application-name" content="Lista de Compras" />
     <meta name="apple-mobile-web-app-title" content="Compras" />
 
-    <!-- PWA comportamento iOS -->
+    <!-- Configuração iOS -->
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
 
-    <!-- Manifesto PWA -->
-    <link rel="manifest" href="/manifest.webmanifest" />
-
-    <!-- Título -->
     <title>Lista de Compras Inteligente | Organize suas compras</title>
   </head>
 
   <body>
-    <!-- Root do React -->
     <div id="root"></div>
-
-    <!-- Script principal -->
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>
