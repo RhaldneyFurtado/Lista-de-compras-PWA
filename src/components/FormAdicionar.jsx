@@ -1,45 +1,32 @@
-// Importa estado do React
 import { useState } from "react";
 
-// Formulário para adicionar novos itens
+// Formulário de planejamento
 export default function FormAdicionar({ aoAdicionar }) {
-  // Estado do nome
   const [nome, setNome] = useState("");
-
-  // Estado da quantidade
   const [quantidade, setQuantidade] = useState(1);
 
-  // Estado do preço unitário
-  const [precoUnitario, setPrecoUnitario] = useState("");
-
-  // Função ao enviar formulário
-  const handleSubmit = (e) => {
+  function handleSubmit(e) {
     e.preventDefault();
 
-    // Evita envio vazio
     if (!nome.trim()) return;
 
-    // Envia objeto completo para o hook
     aoAdicionar({
-      nome: nome.trim(),
-      quantidade: Number(quantidade),
-      precoUnitario: Number(precoUnitario),
+      nome,
+      quantidade,
     });
 
-    // Limpa campos
     setNome("");
     setQuantidade(1);
-    setPrecoUnitario("");
-  };
+  }
 
   return (
-    <form onSubmit={handleSubmit} className="mb-4 flex gap-2 flex-wrap">
-      {/* Nome do item */}
+    <form onSubmit={handleSubmit} className="flex gap-2 mb-4">
+      {/* Nome */}
       <input
         value={nome}
         onChange={(e) => setNome(e.target.value)}
-        placeholder="Nome do item"
-        className="flex-1 border rounded-lg px-3 py-2"
+        placeholder="Produto"
+        className="flex-1 border p-2 rounded"
       />
 
       {/* Quantidade */}
@@ -47,26 +34,10 @@ export default function FormAdicionar({ aoAdicionar }) {
         type="number"
         value={quantidade}
         onChange={(e) => setQuantidade(e.target.value)}
-        placeholder="Qtd"
-        min="1"
-        className="w-20 border rounded-lg px-3 py-2"
+        className="w-20 border p-2 rounded"
       />
 
-      {/* Preço unitário */}
-      <input
-        type="number"
-        value={precoUnitario}
-        onChange={(e) => setPrecoUnitario(e.target.value)}
-        placeholder="Preço"
-        step="0.01"
-        min="0"
-        className="w-28 border rounded-lg px-3 py-2"
-      />
-
-      {/* Botão adicionar */}
-      <button className="bg-emerald-500 text-white px-4 rounded-lg">
-        Adicionar
-      </button>
+      <button className="bg-green-500 text-white px-4 rounded">+</button>
     </form>
   );
 }

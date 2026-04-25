@@ -1,34 +1,20 @@
-import { DollarSign, Package, CheckCircle, Clock, Tag } from "lucide-react";
+import { DollarSign, Package, CheckCircle, Clock } from "lucide-react";
 
 import { formatarMoeda } from "../utils/formatadores";
 
 /**
- * Componente: ResumoTotal
- *
- * Responsável por exibir estatísticas da lista de compras:
- * - Valor total
- * - Quantidade de itens
- * - Itens comprados
- * - Itens com preço
- * - Itens restantes
- * - Barra de progresso (modo feira)
+ * Componente de resumo da lista de compras
+ * Mostra totais, progresso e estatísticas gerais
  */
 export default function ResumoTotal({ totais, modo }) {
-  /**
-   * Desestrutura os dados calculados pelo hook
-   */
-  const {
-    total = 0,
-    quantidadeItens = 0,
-    itensComprados = 0,
-    itensComPreco = 0,
-    restantes = 0,
-  } = totais || {};
+  // ==============================
+  // DESESTRUTURAÇÃO SEGURA
+  // ==============================
+  const { total = 0, quantidadeItens = 0, itensComprados = 0 } = totais || {};
 
-  /**
-   * Cálculo seguro do progresso
-   * Evita divisão por zero (NaN / Infinity)
-   */
+  // ==============================
+  // CÁLCULO DE PROGRESSO (%)
+  // ==============================
   const progresso =
     quantidadeItens > 0 ? (itensComprados / quantidadeItens) * 100 : 0;
 
@@ -44,13 +30,14 @@ export default function ResumoTotal({ totais, modo }) {
           </div>
 
           <p className="text-2xl font-bold text-emerald-700">
+            {/* total já vem em reais (convertido no hook) */}
             {formatarMoeda(total)}
           </p>
 
-          <p className="text-xs text-emerald-500 mt-1">Itens com preço</p>
+          <p className="text-xs text-emerald-500 mt-1">Valor total da compra</p>
         </div>
 
-        {/* QUANTIDADE DE ITENS */}
+        {/* 📦 ITENS */}
         <div className="bg-blue-50 rounded-lg p-3">
           <div className="flex items-center gap-2 text-blue-600 mb-1">
             <Package size={18} />
@@ -60,7 +47,7 @@ export default function ResumoTotal({ totais, modo }) {
           <p className="text-2xl font-bold text-blue-700">{quantidadeItens}</p>
         </div>
 
-        {/* ITENS COMPRADOS */}
+        {/* ✅ COMPRADOS */}
         <div className="bg-green-50 rounded-lg p-3">
           <div className="flex items-center gap-2 text-green-600 mb-1">
             <CheckCircle size={18} />
@@ -70,40 +57,39 @@ export default function ResumoTotal({ totais, modo }) {
           <p className="text-2xl font-bold text-green-700">{itensComprados}</p>
         </div>
 
-        {/* RESTANTES */}
+        {/* ⏳ RESTANTES (corrigido cálculo) */}
         <div className="bg-orange-50 rounded-lg p-3">
           <div className="flex items-center gap-2 text-orange-600 mb-1">
             <Clock size={18} />
             <span className="text-sm font-medium">Restantes</span>
           </div>
 
-          <p className="text-2xl font-bold text-orange-700">{restantes}</p>
+          <p className="text-2xl font-bold text-orange-700">
+            {quantidadeItens - itensComprados}
+          </p>
         </div>
       </div>
 
-      {/* ================= BARRA DE PROGRESSO ================= */}
-      {modo === "feira" && quantidadeItens > 0 && (
+      {/* ================= PROGRESSO ================= */}
+      {quantidadeItens > 0 && (
         <div className="mt-4">
-          {/* Texto do progresso */}
+          {/* texto */}
           <div className="flex justify-between text-sm text-gray-600 mb-2">
-            <span>Progresso da compra</span>
+            <span>Progresso</span>
             <span>{Math.round(progresso)}%</span>
           </div>
 
-          {/* Fundo da barra */}
+          {/* barra */}
           <div className="w-full bg-gray-200 rounded-full h-3">
-            {/* Barra preenchida */}
             <div
               className="bg-emerald-500 h-3 rounded-full transition-all duration-500"
-              style={{
-                width: `${progresso}%`,
-              }}
+              style={{ width: `${progresso}%` }}
             />
           </div>
 
-          {/* Texto inferior */}
+          {/* resumo */}
           <p className="text-xs text-gray-500 mt-2 text-center">
-            {itensComprados} de {quantidadeItens} itens no carrinho
+            {itensComprados} de {quantidadeItens} itens
           </p>
         </div>
       )}

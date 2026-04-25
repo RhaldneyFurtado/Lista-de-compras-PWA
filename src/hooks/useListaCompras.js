@@ -1,84 +1,123 @@
-import { useState, useEffect, useCallback, useMemo } from "react";
+// ==============================
+// HOOK DE LISTA (VERSÃO FIREBASE)
+// ==============================
 
-// Chave do localStorage
-const CHAVE_STORAGE = "lista-compras-v1";
+import { useCallback, useMemo } from "react";
 
-// Estado inicial
-const estadoInicial = {
-  modo: "planejamento",
-  estabelecimento: "",
-  itens: [],
-  dataCriacao: null,
-};
+/**
+ * ⚠️ IMPORTANTE:
+ * Este hook NÃO usa mais localStorage.
+ * Ele só manipula dados que vêm do Firestore.
+ */
+export function useListaComprasFirestore(setLista) {
+  // ==============================
+  // ALTERAR MODO
+  // ==============================
+  const alternarModo = useCallback(
+    (modo) => {
+      setLista((prev) => ({
+        ...prev,
+        modo,
+      }));
+    },
+    [setLista],
+  );
 
-export function useListaCompras() {
-  const [lista, setLista] = useState(() => {
-    const dados = localStorage.getItem(CHAVE_STORAGE);
-    return dados ? JSON.parse(dados) : estadoInicial;
-  });
+  // ==============================
+  // ADICIONAR ITEM (PLANEJAMENTO)
+  // ==============================
+  const adicionarItemPlanejamento = useCallback(
+    (item) => {
+      if (!item?.nome) return;
 
-  // Salvar automaticamente
-  useEffect(() => {
-    localStorage.setItem(CHAVE_STORAGE, JSON.stringify(lista));
-  }, [lista]);
+      const novoItem = {
+        id: Date.now().toString(),
+        nome: item.nome,
+        quantidade: Number(item.quantidade || 1),
 
-  // ADICIONAR ITEM (CORRIGIDO)
-  const adicionarItemPlanejamento = useCallback((item) => {
-    if (!item?.nome) return;
+        // preço em centavos (evita erro de float)
+        precoUnitario: 0,
 
-    const novoItem = {
-      id: Date.now().toString(),
-      nome: item.nome,
-      quantidade: item.quantidade || 1,
-      precoUnitario: item.precoUnitario || 0,
-      comprado: false,
-      categoria: "geral",
-    };
+        comprado: false,
+      };
 
-    setLista((prev) => ({
-      ...prev,
-      itens: [...prev.itens, novoItem],
-      dataCriacao: prev.dataCriacao || new Date().toISOString(),
-    }));
-  }, []);
+      setLista((prev) => ({
+        ...prev,
+        itens: [...(prev.itens || []), novoItem],
+      }));
+    },
+    [setLista],
+  );
 
+  // ==============================
+  // ATUALIZAR ITEM (FEIRA)
+  // ==============================
+  const atualizarItemFeira = useCallback(
+    (id, dados) => {
+      setLista((prev) => ({
+        ...prev,
+        itens: (prev.itens || []).map((item) =>
+          item.id === id ? { ...item, ...dados } : item,
+        ),
+      }));
+    },
+    [setLista],
+  );
+
+  // ==============================
   // REMOVER ITEM
-  const removerItem = useCallback((id) => {
-    setLista((prev) => ({
-      ...prev,
-      itens: prev.itens.filter((item) => item.id !== id),
-    }));
-  }, []);
+  // ==============================
+  const removerItem = useCallback(
+    (id) => {
+      setLista((prev) => ({
+        ...prev,
+        itens: (prev.itens || []).filter((item) => item.id !== id),
+      }));
+    },
+    [setLista],
+  );
 
-  // MARCAR COMO COMPRADO
-  const alternarComprado = useCallback((id) => {
-    setLista((prev) => ({
-      ...prev,
-      itens: prev.itens.map((item) =>
-        item.id === id ? { ...item, comprado: !item.comprado } : item,
-      ),
-    }));
-  }, []);
+  // ==============================
+  // TOGGLE COMPRADO
+  // ==============================
+  const alternarComprado = useCallback(
+    (id) => {
+      setLista((prev) => ({
+        ...prev,
+        itens: (prev.itens || []).map((item) =>
+          item.id === id ? { ...item, comprado: !item.comprado } : item,
+        ),
+      }));
+    },
+    [setLista],
+  );
 
+  // ==============================
   // TOTAIS
-  const totais = useMemo(() => {
-    const total = lista.itens.reduce((acc, item) => {
-      return acc + item.quantidade * item.precoUnitario;
-    }, 0);
+  // ==============================
+  const calcularTotais = useMemo(() => {
+    return (itens = []) => {
+      const totalCentavos = itens.reduce((acc, item) => {
+        return acc + item.quantidade * (item.precoUnitario || 0);
+      }, 0);
 
-    return {
-      total: Number(total.toFixed(2)),
-      quantidadeItens: lista.itens.length,
+      return {
+        total: totalCentavos / 100,
+        quantidadeItens: itens.length,
+        itensComprados: itens.filter((i) => i.comprado).length,
+      };
     };
-  }, [lista.itens]);
+  }, []);
 
+  // ==============================
+  // EXPORTAÇÃO
+  // ==============================
   return {
-    lista,
-    itens: lista.itens,
-
+    alternarModo,
     adicionarItemPlanejamento,
+    atualizarItemFeira,
     removerItem,
     alternarComprado,
-    totais,
+    calcularTotais,
   };
 }

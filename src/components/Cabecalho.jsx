@@ -1,47 +1,86 @@
-// Importa dois ícones da biblioteca lucide-react
-// Trash2 = ícone de lixeira (remover)
-// GripVertical = ícone de "arrastar" (reorganizar item)
-import { ShoppingCart, Trash2 } from "lucide-react";
+// ==============================
+// IMPORTA ÍCONES
+// ==============================
+import { ShoppingCart, Trash2, LogOut, User } from "lucide-react";
 
-// Componente de topo da aplicação
+// ==============================
+// COMPONENTE - CABEÇALHO
+// ==============================
 export default function Cabecalho({
   estabelecimento,
   aoDefinirEstabelecimento,
   aoLimpar,
+  usuario,
+  aoLogout,
 }) {
   return (
     <header className="bg-emerald-600 text-white shadow-lg">
-      <div className="max-w-4xl mx-auto px-4 py-4">
-        {/* TÍTULO E BOTÃO LIMPAR */}
-        <div className="flex items-center justify-between mb-4">
-          {/* Logo + Nome */}
+      <div className="mx-auto max-w-4xl px-4 py-4">
+        {/* TOPO */}
+        <div className="mb-4 flex flex-wrap items-center justify-between gap-4">
+          {/* LOGO */}
           <div className="flex items-center gap-3">
-            <div className="bg-white p-2 rounded-lg">
+            <div className="rounded-lg bg-white p-2">
               <ShoppingCart className="text-emerald-600" size={28} />
             </div>
 
             <div>
               <h1 className="text-2xl font-bold">Lista de Compras</h1>
-              <p className="text-emerald-100 text-sm">Organize suas compras</p>
+              <p className="text-sm text-emerald-100">Organize suas compras</p>
             </div>
           </div>
 
-          {/* Botão limpar lista */}
-          <button
-            onClick={aoLimpar}
-            className="bg-emerald-700 hover:bg-emerald-800 p-2 rounded-lg"
-          >
-            <Trash2 size={20} />
-          </button>
+          {/* USUÁRIO */}
+          <div className="flex items-center gap-3">
+            {/* FOTO OU ÍCONE */}
+            <div className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-full border-2 border-white bg-emerald-700">
+              {usuario?.photoURL ? (
+                <img
+                  src={usuario.photoURL}
+                  alt={usuario?.displayName || "Usuário"}
+                  className="h-full w-full object-cover"
+                  referrerPolicy="no-referrer"
+                />
+              ) : (
+                <User size={20} />
+              )}
+            </div>
+
+            {/* NOME */}
+            <div className="hidden sm:block">
+              <p className="max-w-[160px] truncate text-sm font-medium">
+                {usuario?.displayName || "Usuário"}
+              </p>
+              <p className="text-xs text-emerald-100">Conectado</p>
+            </div>
+
+            {/* SAIR */}
+            <button
+              onClick={aoLogout}
+              className="rounded-lg bg-emerald-700 p-2 transition-colors hover:bg-emerald-800"
+              title="Sair"
+            >
+              <LogOut size={20} />
+            </button>
+
+            {/* LIMPAR */}
+            <button
+              onClick={aoLimpar}
+              className="rounded-lg bg-emerald-700 p-2 transition-colors hover:bg-emerald-800"
+              title="Limpar lista"
+            >
+              <Trash2 size={20} />
+            </button>
+          </div>
         </div>
 
-        {/* INPUT DO ESTABELECIMENTO */}
+        {/* ESTABELECIMENTO */}
         <input
           type="text"
           value={estabelecimento}
           onChange={(e) => aoDefinirEstabelecimento(e.target.value)}
           placeholder="Nome do mercado..."
-          className="w-full bg-emerald-700 px-3 py-2 rounded-lg text-white"
+          className="w-full rounded-lg bg-emerald-700 px-3 py-2 text-white placeholder-emerald-200 focus:outline-none focus:ring-2 focus:ring-emerald-300"
         />
       </div>
     </header>
