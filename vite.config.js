@@ -1,93 +1,62 @@
 // ==============================
-// Importações principais do Vite
+// IMPORTAÇÕES PRINCIPAIS DO VITE
 // ==============================
-import { defineConfig } from "vite"; // Função que define a configuração do Vite
-import react from "@vitejs/plugin-react"; // Plugin para suporte ao React
-import { VitePWA } from "vite-plugin-pwa"; // Plugin para transformar o app em PWA
+import { defineConfig } from "vite";
+import react from "@vitejs/plugin-react";
+import { VitePWA } from "vite-plugin-pwa";
 
 // ==============================
 // CONFIGURAÇÃO PRINCIPAL
 // ==============================
 export default defineConfig({
   // ==============================
-  // Base obrigatória no GitHub Pages
+  // BASE DO GITHUB PAGES
   // ==============================
-  base: "/Lista-de-compras-PWA/", // Caminho do repositório no GitHub Pages
+  base: "/Lista-de-compras-PWA/",
 
   // ==============================
-  // PLUGINS DO PROJETO
+  // PLUGINS
   // ==============================
   plugins: [
-    // React funcionando no Vite
     react(),
 
-    // ==============================
-    // CONFIGURAÇÃO DO PWA
-    // ==============================
     VitePWA({
       // ==============================
-      // ATUALIZAÇÃO DO SERVICE WORKER
+      // ATUALIZAÇÃO DO PWA
       // ==============================
-      registerType: "prompt",
-      // 👉 Em vez de autoUpdate:
-      // mostra atualização e evita cache preso (mais confiável no GitHub Pages)
+      registerType: "autoUpdate", // 🔥 evita cache travado
 
       // ==============================
-      // WORKBOX (CACHE DO PWA)
+      // WORKBOX (CACHE CONTROLADO)
       // ==============================
       workbox: {
         globPatterns: ["**/*.{js,css,html,ico,png,svg}"],
-
-        // 🔥 força o novo service worker assumir imediatamente
-        skipWaiting: true,
-        clientsClaim: true,
       },
 
       // ==============================
-      // MANIFESTO DO PWA (INSTALAÇÃO)
+      // MANIFESTO DO PWA
       // ==============================
       manifest: {
-        // Nome completo do app
         name: "Lista de Compras Inteligente",
-
-        // Nome curto (aparece no ícone do celular)
         short_name: "Compras",
-
-        // Descrição do app
-        description: "Organize suas compras de forma simples e offline",
-
-        // Cor da barra do navegador no mobile
+        description: "Organize suas compras de forma simples e rápida",
         theme_color: "#10b981",
-
-        // Cor de fundo ao abrir o app
         background_color: "#ffffff",
-
-        // Modo de exibição como app nativo
         display: "standalone",
-
-        // URL inicial do app (IMPORTANTE no GitHub Pages)
         start_url: "/Lista-de-compras-PWA/",
 
-        // ==============================
-        // ÍCONES DO APP (INSTALAÇÃO NO CELULAR)
-        // ==============================
         icons: [
           {
-            // Ícone padrão 192x192
             src: "/Lista-de-compras-PWA/pwa-192x192.png",
             sizes: "192x192",
             type: "image/png",
           },
-
           {
-            // Ícone grande 512x512
             src: "/Lista-de-compras-PWA/pwa-512x512.png",
             sizes: "512x512",
             type: "image/png",
           },
-
           {
-            // Ícone adaptável (Android moderno)
             src: "/Lista-de-compras-PWA/maskable-icon-512x512.png",
             sizes: "512x512",
             type: "image/png",
@@ -97,28 +66,28 @@ export default defineConfig({
       },
 
       // ==============================
-      // CONFIGURAÇÃO DE DESENVOLVIMENTO
+      // DEV (TESTE LOCAL)
       // ==============================
       devOptions: {
-        enabled: true, // permite testar PWA localmente no dev
+        enabled: true,
       },
     }),
   ],
 
   // ==============================
-  // SERVIDOR LOCAL (DEV)
+  // SERVIDOR LOCAL
   // ==============================
   server: {
-    host: true, // permite acessar pelo celular na mesma rede
-    port: 5173, // porta padrão do Vite
-    open: true, // abre o navegador automaticamente
+    host: true,
+    port: 5173,
+    open: true,
   },
 
   // ==============================
-  // BUILD DE PRODUÇÃO
+  // BUILD FINAL
   // ==============================
   build: {
-    sourcemap: true, // ajuda a debugar erros em produção
-    outDir: "dist", // pasta final do build
+    sourcemap: false, // 🔥 reduz cache pesado no mobile
+    outDir: "dist",
   },
 });
