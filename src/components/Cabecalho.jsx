@@ -18,7 +18,7 @@ export default function Cabecalho({
 
       <div className="mx-auto max-w-4xl px-4 py-4">
 
-        {/* TOPO */}
+        {/* TOPO RESPONSIVO FIXO */}
         <div className="mb-4 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
 
           {/* LOGO */}
@@ -38,7 +38,6 @@ export default function Cabecalho({
           {/* USUÁRIO + AÇÕES */}
           <div className="flex items-center gap-3 sm:ml-auto">
 
-            {/* FOTO */}
             <div className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-full border-2 border-white bg-emerald-700">
               {usuario?.photoURL ? (
                 <img
@@ -52,15 +51,6 @@ export default function Cabecalho({
               )}
             </div>
 
-            {/* NOME */}
-            <div className="hidden sm:block">
-              <p className="max-w-[160px] truncate text-sm font-medium">
-                {usuario?.displayName || "Usuário"}
-              </p>
-              <p className="text-xs text-emerald-100">Conectado</p>
-            </div>
-
-            {/* SAIR */}
             <button
               onClick={aoLogout}
               className="rounded-lg bg-emerald-700 p-2 hover:bg-emerald-800"
@@ -69,7 +59,6 @@ export default function Cabecalho({
               <LogOut size={20} />
             </button>
 
-            {/* LIMPAR */}
             <button
               onClick={aoLimpar}
               className="rounded-lg bg-emerald-700 p-2 hover:bg-emerald-800"
@@ -79,9 +68,10 @@ export default function Cabecalho({
             </button>
 
           </div>
+
         </div>
 
-        {/* ESTABELECIMENTO */}
+        {/* INPUT */}
         <input
           type="text"
           value={estabelecimento}
@@ -89,6 +79,7 @@ export default function Cabecalho({
           placeholder="Nome do mercado..."
           className="w-full rounded-lg bg-emerald-700 px-3 py-2 text-white placeholder-emerald-200 focus:outline-none focus:ring-2 focus:ring-emerald-300"
         />
+
       </div>
     </header>
   );
