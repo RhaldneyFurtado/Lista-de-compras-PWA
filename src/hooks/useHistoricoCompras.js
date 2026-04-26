@@ -3,50 +3,36 @@
 // ==============================
 
 import { useState, useEffect } from "react";
-
 import { db } from "../services/firebase";
+import { collection, getDocs, deleteDoc, doc } from "firebase/firestore";
 
-import {
-  collection,
-  getDocs,
-  query,
-  orderBy,
-  deleteDoc,
-  doc,
-} from "firebase/firestore";
-
-// ==============================
-// HOOK
-// ==============================
+/**
+ * Hook responsável pelo histórico de compras
+ */
 export function useHistoricoCompras(usuario) {
   const [historico, setHistorico] = useState([]);
   const [carregando, setCarregando] = useState(true);
 
-  const uid = usuario?.uid;
-
   // ==============================
-  // CARREGAR HISTÓRICO
+  // CARREGAR HISTÓRICO (ESTÁVEL)
   // ==============================
   useEffect(() => {
-    if (!uid) {
-      setHistorico([]);
-      setCarregando(false);
-      return;
-    }
+    if (!usuario?.uid) return;
 
     const carregar = async () => {
       try {
         setCarregando(true);
 
-        const ref = collection(db, "users", uid, "compras");
-        const q = query(ref, orderBy("data", "desc"));
-
-        const snap = await getDocs(q);
+        const ref = collection(db, "users", usuario.uid, "compras");
+        const snap = await getDocs(ref);
 
         const lista = snap.docs.map((d) => ({
           id: d.id,
           ...d.data(),
         }));
+
+        // ordenação segura (sem depender de orderBy)
+        lista.sort((a, b) => new Date(b.data) - new Date(a.data));
 
         setHistorico(lista);
       } catch (error) {
@@ -57,14 +43,14 @@ export function useHistoricoCompras(usuario) {
     };
 
     carregar();
-  }, [uid]);
+  }, [usuario?.uid]);
 
   // ==============================
-  // DELETAR COMPRA (CORRIGIDO)
+  // DELETAR COMPRA
   // ==============================
   const deletarCompra = async (id) => {
     try {
-      await deleteDoc(doc(db, "users", uid, "compras", id));
+      await deleteDoc(doc(db, "users", usuario.uid, "compras", id));
 
       setHistorico((prev) => prev.filter((item) => item.id !== id));
     } catch (error) {
