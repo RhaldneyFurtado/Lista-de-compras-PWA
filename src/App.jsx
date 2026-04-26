@@ -31,11 +31,11 @@ function App() {
 
   const [aba, setAba] = useState("compras");
 
+  // ==============================
+  // TEMA (SIMPLES E DIRETO)
+  // ==============================
   const [tema, setTema] = useState("claro");
 
-  // ==============================
-  // SINCRONIZA TEMA
-  // ==============================
   useEffect(() => {
     if (lista?.tema) setTema(lista.tema);
   }, [lista?.tema]);
@@ -126,11 +126,6 @@ function App() {
   return (
     <div className="min-h-screen bg-gray-50">
 
-      {/* 🔥 TESTE VISUAL CRÍTICO */}
-      <div style={{ background: "yellow", padding: 10, fontWeight: "bold" }}>
-        APP RENDERIZANDO CORRETAMENTE
-      </div>
-
       <Cabecalho
         usuario={usuario}
         estabelecimento={lista.estabelecimento || ""}
@@ -151,4 +146,119 @@ function App() {
 
           <button
             onClick={() => setAba("compras")}
-            className={`flex
+            className={`flex-1 p-3 rounded-lg font-semibold ${
+              aba === "compras"
+                ? "bg-emerald-600 text-white"
+                : "bg-white text-gray-700"
+            }`}
+          >
+            Compras
+          </button>
+
+          <button
+            onClick={() => setAba("historico")}
+            className={`flex-1 p-3 rounded-lg font-semibold ${
+              aba === "historico"
+                ? "bg-emerald-600 text-white"
+                : "bg-white text-gray-700"
+            }`}
+          >
+            Histórico
+          </button>
+
+        </div>
+
+        {aba === "compras" && (
+          <>
+            <AlternarModo
+              modo={lista.modo}
+              aoAlternar={(m) =>
+                setLista((p) => ({ ...p, modo: m }))
+              }
+            />
+
+            <FormAdicionar
+              aoAdicionar={(d) =>
+                setLista((p) => ({
+                  ...p,
+                  itens: [
+                    ...p.itens,
+                    {
+                      id: Date.now().toString(),
+                      nome: d.nome,
+                      quantidade: d.quantidade,
+                      precoUnitario: 0,
+                      comprado: false,
+                    },
+                  ],
+                }))
+              }
+            />
+
+            <ListaItens
+              itens={itens}
+              modo={lista.modo}
+              aoAtualizar={(id, dados) =>
+                setLista((p) => ({
+                  ...p,
+                  itens: p.itens.map((i) =>
+                    i.id === id ? { ...i, ...dados } : i
+                  ),
+                }))
+              }
+              aoRemover={(id) =>
+                setLista((p) => ({
+                  ...p,
+                  itens: p.itens.filter((i) => i.id !== id),
+                }))
+              }
+              aoAlternarComprado={(id) =>
+                setLista((p) => ({
+                  ...p,
+                  itens: p.itens.map((i) =>
+                    i.id === id
+                      ? { ...i, comprado: !i.comprado }
+                      : i
+                  ),
+                }))
+              }
+            />
+
+            <ResumoTotal
+              totais={{
+                total: itens.reduce(
+                  (acc, i) =>
+                    acc +
+                    (i.quantidade || 0) * (i.precoUnitario || 0),
+                  0
+                ),
+                quantidadeItens: itens.length,
+                itensComprados: itens.filter((i) => i.comprado).length,
+              }}
+            />
+
+            {itens.length > 0 && (
+              <button
+                onClick={finalizarCompra}
+                className="w-full bg-emerald-600 text-white p-4 rounded-lg"
+              >
+                Finalizar Compra
+              </button>
+            )}
+          </>
+        )}
+
+        {aba === "historico" && (
+          <Historico
+            historico={historico}
+            carregando={carregando}
+            deletarCompra={deletarCompra}
+          />
+        )}
+
+      </main>
+    </div>
+  );
+}
+
+export default App;
