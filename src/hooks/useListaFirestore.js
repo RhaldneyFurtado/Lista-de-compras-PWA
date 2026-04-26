@@ -16,10 +16,14 @@ export function useListaFirestore(usuario) {
   const uid = usuario?.uid;
 
   // ==============================
-  // CARREGAR LISTA
+  // RESET QUANDO NÃO TEM USUÁRIO
   // ==============================
   useEffect(() => {
-    if (!uid) return;
+    if (!uid) {
+      setLista(null);
+      setLoading(false);
+      return;
+    }
 
     const carregar = async () => {
       setLoading(true);
@@ -34,7 +38,7 @@ export function useListaFirestore(usuario) {
           setLista({
             modo: String(data.modo || "planejamento").toLowerCase().trim(),
             estabelecimento: data.estabelecimento || "",
-            tema: data.tema ?? "claro", // 🔥 IMPORTANTE (fallback real)
+            tema: data.tema ?? "claro",
             itens: (data.itens || []).map((item) => ({
               ...item,
               precoUnitario: Number(item.precoUnitario || 0),
