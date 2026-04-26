@@ -18,7 +18,7 @@ export default function Cabecalho({
 
       <div className="mx-auto max-w-4xl px-4 py-4">
 
-        {/* TOPO (CORRIGIDO MOBILE + DESKTOP) */}
+        {/* TOPO */}
         <div className="mb-4 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
 
           {/* LOGO */}
@@ -35,13 +35,14 @@ export default function Cabecalho({
             </div>
           </div>
 
-          {/* USUÁRIO + AÇÕES (🔥 FIX DEFINITIVO) */}
+          {/* ============================== */}
+          {/* USUÁRIO + AÇÕES (FIX DEFINITIVO) */}
+          {/* ============================== */}
           <div className="
             flex items-center gap-3
-            self-end
-            sm:self-auto sm:ml-auto
-            w-full sm:w-auto
             justify-end
+            sm:justify-end
+            sm:ml-auto
           ">
 
             {/* AVATAR */}
