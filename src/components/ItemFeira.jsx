@@ -10,8 +10,6 @@ export function ItemFeira({ item, onAtualizar, onRemover, onToggleComprado }) {
   // ESTADOS
   // ==============================
   const [quantidade, setQuantidade] = useState(item.quantidade || 1);
-
-  // valor em centavos (string)
   const [precoInput, setPrecoInput] = useState("");
 
   // ==============================
@@ -28,39 +26,17 @@ export function ItemFeira({ item, onAtualizar, onRemover, onToggleComprado }) {
   }, [item]);
 
   // ==============================
-  // FORMATAR VISUAL (centavos → reais)
-  // ==============================
-  const formatarVisor = (valor) => {
-    const numero = Number(valor || 0);
-    return (numero / 100).toLocaleString("pt-BR", {
-      minimumFractionDigits: 2,
-    });
-  };
-
-  // ==============================
-  // INPUT
-  // ==============================
-  const handlePrecoChange = (e) => {
-    const valor = e.target.value.replace(/\D/g, "");
-    setPrecoInput(valor);
-  };
-
-  // ==============================
-  // SALVAR BACKEND
-  // ==============================
-  const handleBlur = () => {
-    const centavos = Number(precoInput || 0);
-
-    onAtualizar(item.id, {
-      precoUnitario: centavos / 100,
-    });
-  };
-
-  // ==============================
   // QUANTIDADE
   // ==============================
   const handleQuantidadeChange = (e) => {
-    const novaQuantidade = Number(e.target.value) || 1;
+    const valor = e.target.value;
+
+    if (valor === "") {
+      setQuantidade("");
+      return;
+    }
+
+    const novaQuantidade = Math.max(1, parseInt(valor, 10));
 
     setQuantidade(novaQuantidade);
 
@@ -70,11 +46,26 @@ export function ItemFeira({ item, onAtualizar, onRemover, onToggleComprado }) {
   };
 
   // ==============================
+  // PREÇO
+  // ==============================
+  const handlePrecoChange = (e) => {
+    const valor = e.target.value.replace(/\D/g, "");
+    setPrecoInput(valor);
+  };
+
+  const handleBlur = () => {
+    const centavos = Number(precoInput || 0);
+
+    onAtualizar(item.id, {
+      precoUnitario: centavos / 100,
+    });
+  };
+
+  // ==============================
   // TOTAL
   // ==============================
-  const precoReais = Number(precoInput || 0) / 100;
-
-  const totalItem = quantidade * precoReais;
+  const totalItem =
+    Number(quantidade || 0) * (Number(precoInput || 0) / 100);
 
   const totalFormatado = totalItem.toLocaleString("pt-BR", {
     minimumFractionDigits: 2,
@@ -84,8 +75,10 @@ export function ItemFeira({ item, onAtualizar, onRemover, onToggleComprado }) {
   // RENDER
   // ==============================
   return (
-    <div className="rounded-lg border p-4 shadow-sm transition-all">
-      <div className="flex flex-wrap items-center gap-3 md:flex-nowrap">
+    <div className="rounded-lg border p-4 shadow-sm">
+      <div className="flex flex-col gap-3 md:flex-row md:items-center">
+
+        {/* CHECKBOX */}
         <input
           type="checkbox"
           checked={item.comprado}
@@ -93,8 +86,10 @@ export function ItemFeira({ item, onAtualizar, onRemover, onToggleComprado }) {
           className="h-5 w-5 accent-emerald-500"
         />
 
+        {/* NOME */}
         <span className="flex-1 font-medium">{item.nome}</span>
 
+        {/* QUANTIDADE + PREÇO */}
         <div className="flex items-center gap-2">
           <input
             type="number"
@@ -111,7 +106,7 @@ export function ItemFeira({ item, onAtualizar, onRemover, onToggleComprado }) {
           <input
             type="text"
             inputMode="numeric"
-            value={precoInput ? formatarVisor(precoInput) : ""}
+            value={precoInput}
             onChange={handlePrecoChange}
             onBlur={handleBlur}
             className="w-24 rounded border px-2 py-1 text-right"
@@ -119,14 +114,17 @@ export function ItemFeira({ item, onAtualizar, onRemover, onToggleComprado }) {
           />
         </div>
 
+        {/* TOTAL */}
         <div className="min-w-[110px] text-right">
           <span className="block text-xs text-gray-500">Total</span>
           <span className="font-bold">R$ {totalFormatado}</span>
         </div>
 
+        {/* REMOVER */}
         <button onClick={() => onRemover(item.id)} className="text-red-500">
           <Trash2 size={18} />
         </button>
+
       </div>
     </div>
   );
