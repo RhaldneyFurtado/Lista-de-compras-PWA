@@ -31,11 +31,11 @@ function App() {
 
   const [aba, setAba] = useState("compras");
 
-  // ==============================
-  // TEMA ÚNICO
-  // ==============================
   const [tema, setTema] = useState("claro");
 
+  // ==============================
+  // SINCRONIZA TEMA
+  // ==============================
   useEffect(() => {
     if (lista?.tema) setTema(lista.tema);
   }, [lista?.tema]);
@@ -126,6 +126,11 @@ function App() {
   return (
     <div className="min-h-screen bg-gray-50">
 
+      {/* 🔥 TESTE VISUAL CRÍTICO */}
+      <div style={{ background: "yellow", padding: 10, fontWeight: "bold" }}>
+        APP RENDERIZANDO CORRETAMENTE
+      </div>
+
       <Cabecalho
         usuario={usuario}
         estabelecimento={lista.estabelecimento || ""}
@@ -146,10 +151,4 @@ function App() {
 
           <button
             onClick={() => setAba("compras")}
-            className={`flex-1 p-3 rounded-lg font-semibold ${
-              aba === "compras"
-                ? "bg-emerald-600 text-white"
-                : "bg-white text-gray-700"
-            }`}
-          >
-            Compr
+            className={`flex
