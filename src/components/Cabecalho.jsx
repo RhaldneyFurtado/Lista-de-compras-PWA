@@ -18,7 +18,7 @@ export default function Cabecalho({
 
       <div className="mx-auto max-w-4xl px-4 py-4">
 
-        {/* TOPO RESPONSIVO FIXO */}
+        {/* TOPO (CORRIGIDO MOBILE + DESKTOP) */}
         <div className="mb-4 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
 
           {/* LOGO */}
@@ -35,10 +35,17 @@ export default function Cabecalho({
             </div>
           </div>
 
-          {/* USUÁRIO + AÇÕES */}
-          <div className="flex items-center gap-3 sm:ml-auto">
+          {/* USUÁRIO + AÇÕES (🔥 FIX DEFINITIVO) */}
+          <div className="
+            flex items-center gap-3
+            self-end
+            sm:self-auto sm:ml-auto
+            w-full sm:w-auto
+            justify-end
+          ">
 
-            <div className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-full border-2 border-white bg-emerald-700">
+            {/* AVATAR */}
+            <div className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-full border-2 border-white bg-emerald-700 shrink-0">
               {usuario?.photoURL ? (
                 <img
                   src={usuario.photoURL}
@@ -51,17 +58,19 @@ export default function Cabecalho({
               )}
             </div>
 
+            {/* LOGOUT */}
             <button
               onClick={aoLogout}
-              className="rounded-lg bg-emerald-700 p-2 hover:bg-emerald-800"
+              className="rounded-lg bg-emerald-700 p-2 hover:bg-emerald-800 shrink-0"
               title="Sair"
             >
               <LogOut size={20} />
             </button>
 
+            {/* LIMPAR */}
             <button
               onClick={aoLimpar}
-              className="rounded-lg bg-emerald-700 p-2 hover:bg-emerald-800"
+              className="rounded-lg bg-emerald-700 p-2 hover:bg-emerald-800 shrink-0"
               title="Limpar lista"
             >
               <Trash2 size={20} />
