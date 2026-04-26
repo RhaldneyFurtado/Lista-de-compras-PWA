@@ -43,7 +43,7 @@ export default function Cabecalho({
             {/* TEMA */}
             <button
               onClick={() =>
-                aoDefinirTema(tema === "escuro" ? "claro" : "escuro")
+                aoDefinirTema?.(tema === "escuro" ? "claro" : "escuro")
               }
               className="rounded-lg bg-emerald-700 p-2 hover:bg-emerald-800"
               title="Tema"
@@ -51,7 +51,7 @@ export default function Cabecalho({
               {tema === "escuro" ? "☀️" : "🌙"}
             </button>
 
-            {/* AVATAR */}
+            {/* USUÁRIO */}
             <div className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-full border-2 border-white bg-emerald-700 shrink-0">
               {usuario?.photoURL ? (
                 <img
