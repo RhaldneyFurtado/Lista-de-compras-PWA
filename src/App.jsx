@@ -47,6 +47,24 @@ function App() {
   const [aba, setAba] = useState("compras");
 
   // ==============================
+  // TEMA LOCAL (CORREÇÃO)
+  // ==============================
+  const [tema, setTema] = useState("claro");
+
+  useEffect(() => {
+    if (!lista?.tema) return;
+    setTema(lista.tema);
+  }, [lista?.tema]);
+
+  useEffect(() => {
+    document.body.classList.remove("tema-claro", "tema-escuro");
+
+    document.body.classList.add(
+      tema === "escuro" ? "tema-escuro" : "tema-claro"
+    );
+  }, [tema]);
+
+  // ==============================
   // LOGOUT
   // ==============================
   const fazerLogout = async () => {
@@ -54,17 +72,7 @@ function App() {
   };
 
   // ==============================
-  // TEMA GLOBAL (APLICAÇÃO VISUAL)
-  // ==============================
-  useEffect(() => {
-    if (!lista?.tema) return;
-
-    document.body.className =
-      lista.tema === "escuro" ? "tema-escuro" : "tema-claro";
-  }, [lista?.tema]);
-
-  // ==============================
-  // LOADING AUTH
+  // LOADING
   // ==============================
   if (loading) {
     return (
@@ -95,7 +103,7 @@ function App() {
     const total = itens.reduce(
       (acc, item) =>
         acc + (item.quantidade || 0) * (item.precoUnitario || 0),
-      0,
+      0
     );
 
     const compraId = Date.now().toString();
@@ -135,18 +143,26 @@ function App() {
   // ==============================
   return (
     <div className="min-h-screen bg-gray-50">
+
       <Cabecalho
         usuario={usuario}
         estabelecimento={lista.estabelecimento || ""}
         aoDefinirEstabelecimento={(valor) =>
           setLista((prev) => ({ ...prev, estabelecimento: valor }))
         }
-        aoLimpar={() => setLista((prev) => ({ ...prev, itens: [] }))}
-        aoLogout={fazerLogout}
-        tema={lista.tema}
-        aoDefinirTema={(valor) =>
-          setLista((prev) => ({ ...prev, tema: valor }))
+        aoLimpar={() =>
+          setLista((prev) => ({ ...prev, itens: [] }))
         }
+        aoLogout={fazerLogout}
+
+        // ==============================
+        // TEMA
+        // ==============================
+        tema={tema}
+        aoDefinirTema={(valor) => {
+          setTema(valor);
+          setLista((prev) => ({ ...prev, tema: valor }));
+        }}
       />
 
       <main className="mx-auto max-w-4xl space-y-6 px-4 py-6">
@@ -155,6 +171,7 @@ function App() {
         {/* NAVEGAÇÃO */}
         {/* ============================== */}
         <div className="flex gap-2">
+
           <button
             onClick={() => setAba("compras")}
             className={`flex-1 p-3 rounded-lg font-semibold ${
@@ -176,6 +193,7 @@ function App() {
           >
             Histórico
           </button>
+
         </div>
 
         {/* ============================== */}
@@ -215,7 +233,7 @@ function App() {
                 setLista((prev) => ({
                   ...prev,
                   itens: prev.itens.map((i) =>
-                    i.id === id ? { ...i, ...dados } : i,
+                    i.id === id ? { ...i, ...dados } : i
                   ),
                 }))
               }
@@ -231,7 +249,7 @@ function App() {
                   itens: prev.itens.map((i) =>
                     i.id === id
                       ? { ...i, comprado: !i.comprado }
-                      : i,
+                      : i
                   ),
                 }))
               }
@@ -241,9 +259,8 @@ function App() {
               totais={{
                 total: itens.reduce(
                   (acc, i) =>
-                    acc +
-                    (i.quantidade || 0) * (i.precoUnitario || 0),
-                  0,
+                    acc + (i.quantidade || 0) * (i.precoUnitario || 0),
+                  0
                 ),
                 quantidadeItens: itens.length,
                 itensComprados: itens.filter((i) => i.comprado).length,
@@ -271,6 +288,7 @@ function App() {
             deletarCompra={deletarCompra}
           />
         )}
+
       </main>
     </div>
   );
