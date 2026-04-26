@@ -19,18 +19,6 @@ import Login from "./components/Login";
 import Historico from "./components/Historico";
 
 // ==============================
-// FUNÇÃO AUXILIAR
-// ==============================
-function capitalizarTexto(texto) {
-  if (!texto) return "";
-
-  return texto
-    .trim()
-    .toLowerCase()
-    .replace(/(^|\s)\S/g, (l) => l.toUpperCase());
-}
-
-// ==============================
 // APP
 // ==============================
 function App() {
@@ -44,18 +32,18 @@ function App() {
   const [aba, setAba] = useState("compras");
 
   // ==============================
-  // TEMA LOCAL CONTROLADO
+  // TEMA (ÚNICA FONTE DE VERDADE)
   // ==============================
   const [tema, setTema] = useState("claro");
 
   // sincroniza Firestore → estado local
   useEffect(() => {
-    if (lista?.tema === "claro" || lista?.tema === "escuro") {
+    if (lista?.tema) {
       setTema(lista.tema);
     }
   }, [lista?.tema]);
 
-  // aplica tema no body
+  // aplica no body
   useEffect(() => {
     document.body.classList.remove("tema-claro", "tema-escuro");
     document.body.classList.add(
@@ -66,4 +54,219 @@ function App() {
   // ==============================
   // LOGOUT
   // ==============================
-  const
+  const fazerLogout = async () => {
+    await signOut(auth);
+  };
+
+  // ==============================
+  // LOADING
+  // ==============================
+  if (loading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <p>Carregando...</p>
+      </div>
+    );
+  }
+
+  if (!usuario) return <Login />;
+
+  if (!lista || !setLista) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <p>Carregando lista...</p>
+      </div>
+    );
+  }
+
+  const itens = lista.itens || [];
+
+  // ==============================
+  // FINALIZAR COMPRA
+  // ==============================
+  const finalizarCompra = async () => {
+    if (!itens.length) return;
+
+    const total = itens.reduce(
+      (acc, i) => acc + (i.quantidade || 0) * (i.precoUnitario || 0),
+      0
+    );
+
+    const id = Date.now().toString();
+
+    const compra = {
+      id,
+      estabelecimento: lista.estabelecimento,
+      itens,
+      total,
+      data: new Date().toISOString(),
+    };
+
+    const { doc, setDoc } = await import("firebase/firestore");
+    const { db } = await import("./services/firebase");
+
+    await setDoc(doc(db, "users", usuario.uid, "compras", id), compra);
+
+    await setDoc(doc(db, "users", usuario.uid, "lista", "dados"), {
+      modo: "planejamento",
+      estabelecimento: "",
+      tema,
+      itens: [],
+    });
+
+    setLista({
+      modo: "planejamento",
+      estabelecimento: "",
+      tema,
+      itens: [],
+    });
+
+    setAba("historico");
+  };
+
+  // ==============================
+  // RENDER
+  // ==============================
+  return (
+    <div className="min-h-screen bg-gray-50">
+
+      <Cabecalho
+        usuario={usuario}
+        estabelecimento={lista.estabelecimento || ""}
+        aoDefinirEstabelecimento={(v) =>
+          setLista((p) => ({ ...p, estabelecimento: v }))
+        }
+        aoLimpar={() =>
+          setLista((p) => ({ ...p, itens: [] }))
+        }
+        aoLogout={fazerLogout}
+
+        // 🔥 TEMA (ÚNICO)
+        tema={tema}
+        aoDefinirTema={(v) => {
+          setTema(v);
+          setLista((p) => ({ ...p, tema: v }));
+        }}
+      />
+
+      <main className="mx-auto max-w-4xl space-y-6 px-4 py-6">
+
+        <div className="flex gap-2">
+
+          <button
+            onClick={() => setAba("compras")}
+            className={`flex-1 p-3 rounded-lg font-semibold ${
+              aba === "compras"
+                ? "bg-emerald-600 text-white"
+                : "bg-white text-gray-700"
+            }`}
+          >
+            Compras
+          </button>
+
+          <button
+            onClick={() => setAba("historico")}
+            className={`flex-1 p-3 rounded-lg font-semibold ${
+              aba === "historico"
+                ? "bg-emerald-600 text-white"
+                : "bg-white text-gray-700"
+            }`}
+          >
+            Histórico
+          </button>
+
+        </div>
+
+        {aba === "compras" && (
+          <>
+            <AlternarModo
+              modo={lista.modo}
+              aoAlternar={(m) =>
+                setLista((p) => ({ ...p, modo: m }))
+              }
+            />
+
+            <FormAdicionar
+              aoAdicionar={(d) =>
+                setLista((p) => ({
+                  ...p,
+                  itens: [
+                    ...p.itens,
+                    {
+                      id: Date.now().toString(),
+                      nome: d.nome,
+                      quantidade: d.quantidade,
+                      precoUnitario: 0,
+                      comprado: false,
+                    },
+                  ],
+                }))
+              }
+            />
+
+            <ListaItens
+              itens={itens}
+              modo={lista.modo}
+              aoAtualizar={(id, dados) =>
+                setLista((p) => ({
+                  ...p,
+                  itens: p.itens.map((i) =>
+                    i.id === id ? { ...i, ...dados } : i
+                  ),
+                }))
+              }
+              aoRemover={(id) =>
+                setLista((p) => ({
+                  ...p,
+                  itens: p.itens.filter((i) => i.id !== id),
+                }))
+              }
+              aoAlternarComprado={(id) =>
+                setLista((p) => ({
+                  ...p,
+                  itens: p.itens.map((i) =>
+                    i.id === id
+                      ? { ...i, comprado: !i.comprado }
+                      : i
+                  ),
+                }))
+              }
+            />
+
+            <ResumoTotal
+              totais={{
+                total: itens.reduce(
+                  (acc, i) =>
+                    acc +
+                    (i.quantidade || 0) * (i.precoUnitario || 0),
+                  0
+                ),
+                quantidadeItens: itens.length,
+                itensComprados: itens.filter((i) => i.comprado).length,
+              }}
+            />
+
+            {itens.length > 0 && (
+              <button
+                onClick={finalizarCompra}
+                className="w-full bg-emerald-600 text-white p-4 rounded-lg"
+              >
+                Finalizar Compra
+              </button>
+            )}
+          </>
+        )}
+
+        {aba === "historico" && (
+          <Historico
+            historico={historico}
+            carregando={carregando}
+            deletarCompra={deletarCompra}
+          />
+        )}
+      </main>
+    </div>
+  );
+}
+
+export default App;
