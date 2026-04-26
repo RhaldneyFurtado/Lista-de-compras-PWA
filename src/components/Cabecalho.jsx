@@ -1,10 +1,10 @@
 // ==============================
-// IMPORTA ÍCONES
+// IMPORTAÇÕES
 // ==============================
 import { ShoppingCart, Trash2, LogOut, User } from "lucide-react";
 
 // ==============================
-// COMPONENTE - CABEÇALHO
+// CABEÇALHO
 // ==============================
 export default function Cabecalho({
   estabelecimento,
@@ -15,35 +15,27 @@ export default function Cabecalho({
   tema,
   aoDefinirTema,
 }) {
+  const temaAtual = tema || "claro";
+
   return (
-    <header className="bg-emerald-600 text-white shadow-lg relative">
+    <header className="bg-emerald-600 text-white shadow-lg">
 
       {/* ============================== */}
-      {/* BOTÃO TEMA (FIXO NA TELA) */}
+      {/* BOTÃO TEMA (GARANTIDO VISÍVEL) */}
       {/* ============================== */}
       <button
         onClick={() =>
-          aoDefinirTema(tema === "escuro" ? "claro" : "escuro")
+          aoDefinirTema(temaAtual === "escuro" ? "claro" : "escuro")
         }
-        className="
-          fixed top-4 left-4
-          z-50
-          rounded-full
-          bg-emerald-800
-          p-3
-          shadow-lg
-          hover:bg-emerald-900
-        "
+        className="fixed top-3 left-3 z-50 bg-emerald-800 p-3 rounded-full shadow-lg"
         title="Alternar tema"
       >
-        {tema === "escuro" ? "☀️" : "🌙"}
+        {temaAtual === "escuro" ? "☀️" : "🌙"}
       </button>
 
       <div className="mx-auto max-w-4xl px-4 py-4">
 
-        {/* ============================== */}
         {/* TOPO */}
-        {/* ============================== */}
         <div className="mb-4 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
 
           {/* LOGO */}
@@ -61,14 +53,13 @@ export default function Cabecalho({
           </div>
 
           {/* AÇÕES */}
-          <div className="flex items-center gap-3 sm:ml-auto justify-end">
+          <div className="flex items-center gap-3">
 
             {/* USUÁRIO */}
-            <div className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-full border-2 border-white bg-emerald-700 shrink-0">
+            <div className="h-10 w-10 flex items-center justify-center rounded-full bg-emerald-700 overflow-hidden">
               {usuario?.photoURL ? (
                 <img
                   src={usuario.photoURL}
-                  alt="Usuário"
                   className="h-full w-full object-cover"
                   referrerPolicy="no-referrer"
                 />
@@ -78,6 +69,28 @@ export default function Cabecalho({
             </div>
 
             {/* LOGOUT */}
-            <button
-              onClick={aoLogout}
-              className="rounded
+            <button onClick={aoLogout}>
+              <LogOut size={20} />
+            </button>
+
+            {/* LIMPAR */}
+            <button onClick={aoLimpar}>
+              <Trash2 size={20} />
+            </button>
+
+          </div>
+
+        </div>
+
+        {/* INPUT */}
+        <input
+          value={estabelecimento}
+          onChange={(e) => aoDefinirEstabelecimento(e.target.value)}
+          placeholder="Nome do mercado..."
+          className="w-full rounded-lg bg-emerald-700 px-3 py-2 text-white"
+        />
+
+      </div>
+    </header>
+  );
+}
