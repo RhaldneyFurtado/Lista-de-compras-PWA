@@ -15,9 +15,12 @@ export default function Cabecalho({
 }) {
   return (
     <header className="bg-emerald-600 text-white shadow-lg">
+
       <div className="mx-auto max-w-4xl px-4 py-4">
+
         {/* TOPO */}
-        <div className="mb-4 flex flex-wrap items-center justify-between gap-4">
+        <div className="mb-4 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+
           {/* LOGO */}
           <div className="flex items-center gap-3">
             <div className="rounded-lg bg-white p-2">
@@ -26,18 +29,21 @@ export default function Cabecalho({
 
             <div>
               <h1 className="text-2xl font-bold">Lista de Compras</h1>
-              <p className="text-sm text-emerald-100">Organize suas compras</p>
+              <p className="text-sm text-emerald-100">
+                Organize suas compras
+              </p>
             </div>
           </div>
 
-          {/* USUÁRIO */}
-          <div className="flex items-center gap-3">
-            {/* FOTO OU ÍCONE */}
+          {/* USUÁRIO + AÇÕES */}
+          <div className="flex items-center gap-3 sm:ml-auto">
+
+            {/* FOTO */}
             <div className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-full border-2 border-white bg-emerald-700">
               {usuario?.photoURL ? (
                 <img
                   src={usuario.photoURL}
-                  alt={usuario?.displayName || "Usuário"}
+                  alt="Usuário"
                   className="h-full w-full object-cover"
                   referrerPolicy="no-referrer"
                 />
@@ -57,7 +63,7 @@ export default function Cabecalho({
             {/* SAIR */}
             <button
               onClick={aoLogout}
-              className="rounded-lg bg-emerald-700 p-2 transition-colors hover:bg-emerald-800"
+              className="rounded-lg bg-emerald-700 p-2 hover:bg-emerald-800"
               title="Sair"
             >
               <LogOut size={20} />
@@ -66,11 +72,12 @@ export default function Cabecalho({
             {/* LIMPAR */}
             <button
               onClick={aoLimpar}
-              className="rounded-lg bg-emerald-700 p-2 transition-colors hover:bg-emerald-800"
+              className="rounded-lg bg-emerald-700 p-2 hover:bg-emerald-800"
               title="Limpar lista"
             >
               <Trash2 size={20} />
             </button>
+
           </div>
         </div>
 
