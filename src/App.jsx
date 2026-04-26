@@ -28,7 +28,7 @@ function capitalizarTexto(texto) {
   return texto
     .trim()
     .toLowerCase()
-    .replace(/(^|\s)\S/g, (letra) => letra.toUpperCase());
+    .replace(/(^|\s)\S/g, (l) => l.toUpperCase());
 }
 
 // ==============================
@@ -47,15 +47,18 @@ function App() {
   const [aba, setAba] = useState("compras");
 
   // ==============================
-  // TEMA LOCAL (CORREÇÃO)
+  // TEMA LOCAL (OBRIGATÓRIO PARA NÃO QUEBRAR UI)
   // ==============================
   const [tema, setTema] = useState("claro");
 
+  // sincroniza com firestore
   useEffect(() => {
-    if (!lista?.tema) return;
-    setTema(lista.tema);
+    if (lista?.tema) {
+      setTema(lista.tema);
+    }
   }, [lista?.tema]);
 
+  // aplica no body
   useEffect(() => {
     document.body.classList.remove("tema-claro", "tema-escuro");
 
@@ -71,9 +74,6 @@ function App() {
     await signOut(auth);
   };
 
-  // ==============================
-  // LOADING
-  // ==============================
   if (loading) {
     return (
       <div className="flex min-h-screen items-center justify-center">
@@ -101,15 +101,14 @@ function App() {
     if (!itens.length) return;
 
     const total = itens.reduce(
-      (acc, item) =>
-        acc + (item.quantidade || 0) * (item.precoUnitario || 0),
+      (acc, i) => acc + (i.quantidade || 0) * (i.precoUnitario || 0),
       0
     );
 
-    const compraId = Date.now().toString();
+    const id = Date.now().toString();
 
     const compra = {
-      id: compraId,
+      id,
       estabelecimento: lista.estabelecimento,
       itens,
       total,
@@ -119,19 +118,19 @@ function App() {
     const { doc, setDoc } = await import("firebase/firestore");
     const { db } = await import("./services/firebase");
 
-    await setDoc(doc(db, "users", usuario.uid, "compras", compraId), compra);
+    await setDoc(doc(db, "users", usuario.uid, "compras", id), compra);
 
     await setDoc(doc(db, "users", usuario.uid, "lista", "dados"), {
       modo: "planejamento",
       estabelecimento: "",
-      tema: lista.tema || "claro",
+      tema: lista.tema ?? "claro",
       itens: [],
     });
 
     setLista({
       modo: "planejamento",
       estabelecimento: "",
-      tema: lista.tema || "claro",
+      tema: lista.tema ?? "claro",
       itens: [],
     });
 
@@ -147,29 +146,27 @@ function App() {
       <Cabecalho
         usuario={usuario}
         estabelecimento={lista.estabelecimento || ""}
-        aoDefinirEstabelecimento={(valor) =>
-          setLista((prev) => ({ ...prev, estabelecimento: valor }))
+        aoDefinirEstabelecimento={(v) =>
+          setLista((p) => ({ ...p, estabelecimento: v }))
         }
         aoLimpar={() =>
-          setLista((prev) => ({ ...prev, itens: [] }))
+          setLista((p) => ({ ...p, itens: [] }))
         }
         aoLogout={fazerLogout}
 
         // ==============================
-        // TEMA
+        // TEMA (FIX DEFINITIVO)
         // ==============================
         tema={tema}
-        aoDefinirTema={(valor) => {
-          setTema(valor);
-          setLista((prev) => ({ ...prev, tema: valor }));
+        aoDefinirTema={(v) => {
+          setTema(v);
+          setLista((p) => ({ ...p, tema: v }));
         }}
       />
 
       <main className="mx-auto max-w-4xl space-y-6 px-4 py-6">
 
-        {/* ============================== */}
         {/* NAVEGAÇÃO */}
-        {/* ============================== */}
         <div className="flex gap-2">
 
           <button
@@ -196,28 +193,26 @@ function App() {
 
         </div>
 
-        {/* ============================== */}
-        {/* COMPRAS */}
-        {/* ============================== */}
+        {/* CONTEÚDO */}
         {aba === "compras" && (
           <>
             <AlternarModo
               modo={lista.modo}
-              aoAlternar={(modo) =>
-                setLista((prev) => ({ ...prev, modo }))
+              aoAlternar={(m) =>
+                setLista((p) => ({ ...p, modo: m }))
               }
             />
 
             <FormAdicionar
-              aoAdicionar={(dados) =>
-                setLista((prev) => ({
-                  ...prev,
+              aoAdicionar={(d) =>
+                setLista((p) => ({
+                  ...p,
                   itens: [
-                    ...prev.itens,
+                    ...p.itens,
                     {
                       id: Date.now().toString(),
-                      nome: capitalizarTexto(dados.nome),
-                      quantidade: dados.quantidade,
+                      nome: capitalizarTexto(d.nome),
+                      quantidade: d.quantidade,
                       precoUnitario: 0,
                       comprado: false,
                     },
@@ -229,24 +224,24 @@ function App() {
             <ListaItens
               itens={itens}
               modo={lista.modo}
-              aoAtualizar={(id, dados) =>
-                setLista((prev) => ({
-                  ...prev,
-                  itens: prev.itens.map((i) =>
-                    i.id === id ? { ...i, ...dados } : i
+              aoAtualizar={(id, d) =>
+                setLista((p) => ({
+                  ...p,
+                  itens: p.itens.map((i) =>
+                    i.id === id ? { ...i, ...d } : i
                   ),
                 }))
               }
               aoRemover={(id) =>
-                setLista((prev) => ({
-                  ...prev,
-                  itens: prev.itens.filter((i) => i.id !== id),
+                setLista((p) => ({
+                  ...p,
+                  itens: p.itens.filter((i) => i.id !== id),
                 }))
               }
               aoAlternarComprado={(id) =>
-                setLista((prev) => ({
-                  ...prev,
-                  itens: prev.itens.map((i) =>
+                setLista((p) => ({
+                  ...p,
+                  itens: p.itens.map((i) =>
                     i.id === id
                       ? { ...i, comprado: !i.comprado }
                       : i
@@ -258,8 +253,8 @@ function App() {
             <ResumoTotal
               totais={{
                 total: itens.reduce(
-                  (acc, i) =>
-                    acc + (i.quantidade || 0) * (i.precoUnitario || 0),
+                  (a, i) =>
+                    a + (i.quantidade || 0) * (i.precoUnitario || 0),
                   0
                 ),
                 quantidadeItens: itens.length,
@@ -278,9 +273,6 @@ function App() {
           </>
         )}
 
-        {/* ============================== */}
-        {/* HISTÓRICO */}
-        {/* ============================== */}
         {aba === "historico" && (
           <Historico
             historico={historico}
