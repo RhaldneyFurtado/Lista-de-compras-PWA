@@ -12,6 +12,8 @@ export default function Cabecalho({
   aoLimpar,
   usuario,
   aoLogout,
+  tema,
+  aoDefinirTema,
 }) {
   return (
     <header className="bg-emerald-600 text-white shadow-lg">
@@ -35,15 +37,19 @@ export default function Cabecalho({
             </div>
           </div>
 
-          {/* ============================== */}
-          {/* USUÁRIO + AÇÕES (FIX DEFINITIVO) */}
-          {/* ============================== */}
-          <div className="
-            flex items-center gap-3
-            justify-end
-            sm:justify-end
-            sm:ml-auto
-          ">
+          {/* AÇÕES */}
+          <div className="flex items-center gap-3 sm:ml-auto justify-end">
+
+            {/* TEMA */}
+            <button
+              onClick={() =>
+                aoDefinirTema(tema === "escuro" ? "claro" : "escuro")
+              }
+              className="rounded-lg bg-emerald-700 p-2 hover:bg-emerald-800"
+              title="Tema"
+            >
+              {tema === "escuro" ? "☀️" : "🌙"}
+            </button>
 
             {/* AVATAR */}
             <div className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-full border-2 border-white bg-emerald-700 shrink-0">
