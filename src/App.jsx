@@ -36,9 +36,7 @@ function capitalizarTexto(texto) {
 function App() {
   const { usuario, loading } = useAuth();
 
-  const firestore = useListaFirestore(usuario);
-  const lista = firestore?.lista;
-  const setLista = firestore?.setLista;
+  const { lista, setLista } = useListaFirestore(usuario);
 
   const { historico, carregando, deletarCompra } =
     useHistoricoCompras(usuario);
@@ -46,7 +44,7 @@ function App() {
   const [aba, setAba] = useState("compras");
 
   // ==============================
-  // 🔥 TEMA (ÚNICA FONTE DE VERDADE)
+  // TEMA LOCAL CONTROLADO
   // ==============================
   const [tema, setTema] = useState("claro");
 
@@ -57,10 +55,9 @@ function App() {
     }
   }, [lista?.tema]);
 
-  // aplica no body
+  // aplica tema no body
   useEffect(() => {
     document.body.classList.remove("tema-claro", "tema-escuro");
-
     document.body.classList.add(
       tema === "escuro" ? "tema-escuro" : "tema-claro"
     );
@@ -69,146 +66,4 @@ function App() {
   // ==============================
   // LOGOUT
   // ==============================
-  const fazerLogout = async () => {
-    await signOut(auth);
-  };
-
-  if (loading) {
-    return (
-      <div className="flex min-h-screen items-center justify-center">
-        <p>Carregando...</p>
-      </div>
-    );
-  }
-
-  if (!usuario) return <Login />;
-
-  if (!lista || !setLista) {
-    return (
-      <div className="flex min-h-screen items-center justify-center">
-        <p>Carregando lista...</p>
-      </div>
-    );
-  }
-
-  const itens = lista.itens || [];
-
-  // ==============================
-  // FINALIZAR COMPRA
-  // ==============================
-  const finalizarCompra = async () => {
-    if (!itens.length) return;
-
-    const total = itens.reduce(
-      (acc, i) => acc + (i.quantidade || 0) * (i.precoUnitario || 0),
-      0
-    );
-
-    const id = Date.now().toString();
-
-    const compra = {
-      id,
-      estabelecimento: lista.estabelecimento,
-      itens,
-      total,
-      data: new Date().toISOString(),
-    };
-
-    const { doc, setDoc } = await import("firebase/firestore");
-    const { db } = await import("./services/firebase");
-
-    await setDoc(doc(db, "users", usuario.uid, "compras", id), compra);
-
-    await setDoc(doc(db, "users", usuario.uid, "lista", "dados"), {
-      modo: "planejamento",
-      estabelecimento: "",
-      tema,
-      itens: [],
-    });
-
-    setLista({
-      modo: "planejamento",
-      estabelecimento: "",
-      tema,
-      itens: [],
-    });
-
-    setAba("historico");
-  };
-
-  // ==============================
-  // RENDER
-  // ==============================
-  return (
-    <div className="min-h-screen bg-gray-50">
-
-      <Cabecalho
-        usuario={usuario}
-        estabelecimento={lista.estabelecimento || ""}
-
-        aoDefinirEstabelecimento={(v) =>
-          setLista((p) => ({ ...p, estabelecimento: v }))
-        }
-
-        aoLimpar={() =>
-          setLista((p) => ({ ...p, itens: [] }))
-        }
-
-        aoLogout={fazerLogout}
-
-        // 🔥 TEMA DEFINITIVO (SEM BUG)
-        tema={tema}
-        aoDefinirTema={(v) => {
-          setTema(v);
-          setLista((p) => ({ ...p, tema: v }));
-        }}
-      />
-
-      <main className="mx-auto max-w-4xl space-y-6 px-4 py-6">
-
-        {/* NAVEGAÇÃO */}
-        <div className="flex gap-2">
-
-          <button
-            onClick={() => setAba("compras")}
-            className={`flex-1 p-3 rounded-lg font-semibold ${
-              aba === "compras"
-                ? "bg-emerald-600 text-white"
-                : "bg-white text-gray-700"
-            }`}
-          >
-            Compras
-          </button>
-
-          <button
-            onClick={() => setAba("historico")}
-            className={`flex-1 p-3 rounded-lg font-semibold ${
-              aba === "historico"
-                ? "bg-emerald-600 text-white"
-                : "bg-white text-gray-700"
-            }`}
-          >
-            Histórico
-          </button>
-
-        </div>
-
-        {/* COMPRAS */}
-        {aba === "compras" && (
-          <>
-            <AlternarModo
-              modo={lista.modo}
-              aoAlternar={(m) =>
-                setLista((p) => ({ ...p, modo: m }))
-              }
-            />
-
-            <FormAdicionar
-              aoAdicionar={(d) =>
-                setLista((p) => ({
-                  ...p,
-                  itens: [
-                    ...p.itens,
-                    {
-                      id: Date.now().toString(),
-                      nome
+  const
