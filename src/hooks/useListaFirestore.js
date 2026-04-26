@@ -3,6 +3,7 @@
 // ==============================
 
 import { useState, useEffect } from "react";
+
 import { db } from "../services/firebase";
 import { doc, getDoc, setDoc } from "firebase/firestore";
 
@@ -34,7 +35,7 @@ export function useListaFirestore(usuario) {
           setLista({
             modo: String(data.modo || "planejamento").toLowerCase().trim(),
             estabelecimento: data.estabelecimento || "",
-            tema: data.tema || "claro", // 🔥 FIX IMPORTANTE
+            tema: data.tema || "claro", // 🔥 FIX ESSENCIAL
             itens: (data.itens || []).map((item) => ({
               ...item,
               precoUnitario: Number(item.precoUnitario || 0),
@@ -45,7 +46,7 @@ export function useListaFirestore(usuario) {
           setLista({
             modo: "planejamento",
             estabelecimento: "",
-            tema: "claro",
+            tema: "claro", // 🔥 FIX ESSENCIAL
             itens: [],
           });
         }
@@ -78,8 +79,7 @@ export function useListaFirestore(usuario) {
 
         await setDoc(ref, {
           ...lista,
-          modo: String(lista.modo || "planejamento").toLowerCase().trim(),
-          tema: lista.tema || "claro",
+          tema: lista.tema || "claro", // 🔥 FIX
         });
       } catch (error) {
         console.error("Erro ao salvar lista:", error);
