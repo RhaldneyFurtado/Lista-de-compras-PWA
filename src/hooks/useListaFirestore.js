@@ -16,7 +16,7 @@ export function useListaFirestore(usuario) {
   const uid = usuario?.uid;
 
   // ==============================
-  // RESET QUANDO NÃO TEM USUÁRIO
+  // CARREGAR LISTA
   // ==============================
   useEffect(() => {
     if (!uid) {
@@ -38,7 +38,7 @@ export function useListaFirestore(usuario) {
           setLista({
             modo: String(data.modo || "planejamento").toLowerCase().trim(),
             estabelecimento: data.estabelecimento || "",
-            tema: data.tema ?? "claro",
+            tema: data.tema || "claro",
             itens: (data.itens || []).map((item) => ({
               ...item,
               precoUnitario: Number(item.precoUnitario || 0),
@@ -81,8 +81,10 @@ export function useListaFirestore(usuario) {
         const ref = doc(db, "users", uid, "lista", "dados");
 
         await setDoc(ref, {
-          ...lista,
-          tema: lista.tema ?? "claro",
+          modo: lista.modo,
+          estabelecimento: lista.estabelecimento,
+          itens: lista.itens,
+          tema: lista.tema || "claro",
         });
       } catch (error) {
         console.error(error);
