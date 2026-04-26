@@ -1,7 +1,6 @@
 // ==============================
 // IMPORTAÇÕES
 // ==============================
-
 import { useState, useEffect } from "react";
 
 import { useAuth } from "./hooks/useAuth";
@@ -47,13 +46,13 @@ function App() {
   const [aba, setAba] = useState("compras");
 
   // ==============================
-  // TEMA LOCAL (OBRIGATÓRIO PARA NÃO QUEBRAR UI)
+  // 🔥 TEMA (ÚNICA FONTE DE VERDADE)
   // ==============================
   const [tema, setTema] = useState("claro");
 
-  // sincroniza com firestore
+  // sincroniza Firestore → estado local
   useEffect(() => {
-    if (lista?.tema) {
+    if (lista?.tema === "claro" || lista?.tema === "escuro") {
       setTema(lista.tema);
     }
   }, [lista?.tema]);
@@ -123,14 +122,14 @@ function App() {
     await setDoc(doc(db, "users", usuario.uid, "lista", "dados"), {
       modo: "planejamento",
       estabelecimento: "",
-      tema: lista.tema ?? "claro",
+      tema,
       itens: [],
     });
 
     setLista({
       modo: "planejamento",
       estabelecimento: "",
-      tema: lista.tema ?? "claro",
+      tema,
       itens: [],
     });
 
@@ -146,17 +145,18 @@ function App() {
       <Cabecalho
         usuario={usuario}
         estabelecimento={lista.estabelecimento || ""}
+
         aoDefinirEstabelecimento={(v) =>
           setLista((p) => ({ ...p, estabelecimento: v }))
         }
+
         aoLimpar={() =>
           setLista((p) => ({ ...p, itens: [] }))
         }
+
         aoLogout={fazerLogout}
 
-        // ==============================
-        // TEMA (FIX DEFINITIVO)
-        // ==============================
+        // 🔥 TEMA DEFINITIVO (SEM BUG)
         tema={tema}
         aoDefinirTema={(v) => {
           setTema(v);
@@ -193,7 +193,7 @@ function App() {
 
         </div>
 
-        {/* CONTEÚDO */}
+        {/* COMPRAS */}
         {aba === "compras" && (
           <>
             <AlternarModo
@@ -211,79 +211,4 @@ function App() {
                     ...p.itens,
                     {
                       id: Date.now().toString(),
-                      nome: capitalizarTexto(d.nome),
-                      quantidade: d.quantidade,
-                      precoUnitario: 0,
-                      comprado: false,
-                    },
-                  ],
-                }))
-              }
-            />
-
-            <ListaItens
-              itens={itens}
-              modo={lista.modo}
-              aoAtualizar={(id, d) =>
-                setLista((p) => ({
-                  ...p,
-                  itens: p.itens.map((i) =>
-                    i.id === id ? { ...i, ...d } : i
-                  ),
-                }))
-              }
-              aoRemover={(id) =>
-                setLista((p) => ({
-                  ...p,
-                  itens: p.itens.filter((i) => i.id !== id),
-                }))
-              }
-              aoAlternarComprado={(id) =>
-                setLista((p) => ({
-                  ...p,
-                  itens: p.itens.map((i) =>
-                    i.id === id
-                      ? { ...i, comprado: !i.comprado }
-                      : i
-                  ),
-                }))
-              }
-            />
-
-            <ResumoTotal
-              totais={{
-                total: itens.reduce(
-                  (a, i) =>
-                    a + (i.quantidade || 0) * (i.precoUnitario || 0),
-                  0
-                ),
-                quantidadeItens: itens.length,
-                itensComprados: itens.filter((i) => i.comprado).length,
-              }}
-            />
-
-            {itens.length > 0 && (
-              <button
-                onClick={finalizarCompra}
-                className="w-full bg-emerald-600 text-white p-4 rounded-lg"
-              >
-                Finalizar Compra
-              </button>
-            )}
-          </>
-        )}
-
-        {aba === "historico" && (
-          <Historico
-            historico={historico}
-            carregando={carregando}
-            deletarCompra={deletarCompra}
-          />
-        )}
-
-      </main>
-    </div>
-  );
-}
-
-export default App;
+                      nome
