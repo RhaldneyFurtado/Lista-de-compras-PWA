@@ -1,10 +1,13 @@
+/* ==============================
+   TAILWIND BASE
+============================== */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* =====================================================
- * RESET GLOBAL
- * ===================================================== */
+/* ==============================
+   RESET GLOBAL SEGURO
+============================== */
 *,
 *::before,
 *::after {
@@ -13,43 +16,38 @@
   box-sizing: border-box;
 }
 
-/* =====================================================
- * ROOT (boas práticas modernas)
- * ===================================================== */
+/* ==============================
+   ROOT
+============================== */
 :root {
-  /* Cor principal do app */
   --cor-primaria: #10b981;
   --cor-primaria-hover: #059669;
-
-  /* Fundo padrão */
   --cor-fundo: #fafafa;
-
-  /* Scrollbar */
   --cor-scroll: #10b981;
 }
 
-/* =====================================================
- * BODY
- * ===================================================== */
+/* ==============================
+   BODY (CORRIGIDO PARA MOBILE)
+============================== */
 body {
-  font-family:
-    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 
   background-color: var(--cor-fundo);
 
-  /* Evita zoom estranho no iOS */
   -webkit-text-size-adjust: 100%;
-
-  /* Melhor renderização */
   text-rendering: optimizeLegibility;
+
+  /* 🔥 IMPORTANTE: remove qualquer deslocamento no mobile */
+  width: 100%;
+  overflow-x: hidden;
 }
 
-/* =====================================================
- * ANIMAÇÃO DE ENTRADA
- * ===================================================== */
+/* ==============================
+   ANIMAÇÃO
+============================== */
 .item-enter {
   animation: slideIn 0.3s ease-out;
 }
@@ -65,9 +63,9 @@ body {
   }
 }
 
-/* =====================================================
- * CHECKBOX CUSTOM
- * ===================================================== */
+/* ==============================
+   CHECKBOX CUSTOM
+============================== */
 .checkbox-custom {
   appearance: none;
   width: 24px;
@@ -79,19 +77,16 @@ body {
   transition: all 0.2s ease;
 }
 
-/* Foco acessível (IMPORTANTE) */
 .checkbox-custom:focus {
   outline: 2px solid var(--cor-primaria);
   outline-offset: 2px;
 }
 
-/* Estado marcado */
 .checkbox-custom:checked {
   background-color: var(--cor-primaria);
   border-color: var(--cor-primaria);
 }
 
-/* Check interno */
 .checkbox-custom:checked::after {
   content: "✓";
   position: absolute;
@@ -103,63 +98,12 @@ body {
   transform: translate(-50%, -50%);
 }
 
-/* =====================================================
- * SCROLLBAR
- * ===================================================== */
+/* ==============================
+   SCROLLBAR
+============================== */
 ::-webkit-scrollbar {
   width: 8px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #f1f1f1;
-}
-
-::-webkit-scrollbar-thumb {
-  background: var(--cor-scroll);
-  border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: var(--cor-primaria-hover);
-}
-
-/* Firefox */
-html {
-  scrollbar-width: thin;
-  scrollbar-color: var(--cor-scroll) #f1f1f1;
-}
-
-/* =====================================================
- * MELHORIAS PWA / MOBILE
- * ===================================================== */
-
-/* Remove highlight azul ao tocar (Android) */
-* {
-  -webkit-tap-highlight-color: transparent;
-}
-
-/* Melhor experiência de toque */
-button,
-input {
-  touch-action: manipulation;
-}
-
-/* =====================================================
- * RESPONSIVIDADE
- * ===================================================== */
-@media (max-width: 768px) {
-  .checkbox-custom {
-    width: 20px;
-    height: 20px;
-  }
-}
-
-@media (max-width: 480px) {
-  body {
-    padding: 0 8px;
-  }
-
-  ::-webkit-scrollbar {
-    width: 6px;
-  }
-}
+  background: #f
