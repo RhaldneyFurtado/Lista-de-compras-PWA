@@ -1,22 +1,29 @@
+// ==============================
+// MAIN REACT ENTRADA DA APLICAÇÃO
+// ==============================
+
 import React from "react";
 import ReactDOM from "react-dom/client";
 import App from "./App.jsx";
 import "./index.css";
 
-// Busca o elemento root no HTML
+// ==============================
+// ELEMENTO ROOT
+// ==============================
 const container = document.getElementById("root");
 
-// Validação (evita erro silencioso se o root não existir)
+// Validação do root
 if (!container) {
   throw new Error("Elemento #root não encontrado no index.html");
 }
 
-// Cria a raiz da aplicação React
+// ==============================
+// CRIAÇÃO DA RAIZ REACT
+// ==============================
 const root = ReactDOM.createRoot(container);
 
-// Renderiza a aplicação
-root.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>,
-);
+// ==============================
+// RENDER DA APLICAÇÃO
+// ==============================
+// 🔥 REMOVIDO StrictMode para evitar duplicação de hooks no Firebase
+root.render(<App />);

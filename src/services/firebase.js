@@ -3,11 +3,16 @@
 // ==============================
 
 import { initializeApp } from "firebase/app";
-import { getAuth, GoogleAuthProvider } from "firebase/auth";
+import {
+  getAuth,
+  GoogleAuthProvider,
+  setPersistence,
+  browserLocalPersistence,
+} from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 
 // ==============================
-// CONFIG FIREBASE (SEU PROJETO)
+// CONFIG FIREBASE
 // ==============================
 
 const firebaseConfig = {
@@ -20,20 +25,26 @@ const firebaseConfig = {
 };
 
 // ==============================
-// INICIALIZA FIREBASE
+// INIT FIREBASE
 // ==============================
 
 const app = initializeApp(firebaseConfig);
 
 // ==============================
-// EXPORTS PADRÃO (IMPORTANTE)
+// AUTH
 // ==============================
-
-// Autenticação
 export const auth = getAuth(app);
 
-// Provedor Google
-export const googleProvider = new GoogleAuthProvider();
+// 🔥 PERSISTÊNCIA DO LOGIN (EVITA SUMIR USUÁRIO)
+setPersistence(auth, browserLocalPersistence);
 
-// Firestore
+// 🔥 GOOGLE PROVIDER (FORÇA ESCOLHA DE CONTA)
+export const googleProvider = new GoogleAuthProvider();
+googleProvider.setCustomParameters({
+  prompt: "select_account",
+});
+
+// ==============================
+// FIRESTORE
+// ==============================
 export const db = getFirestore(app);

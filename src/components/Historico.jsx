@@ -2,77 +2,130 @@
 // COMPONENTE - HISTÓRICO DE COMPRAS
 // ==============================
 
+import { useState } from "react";
+import { Trash2 } from "lucide-react";
+
 /**
- * Exibe o histórico de compras realizadas pelo usuário
- *
- * @param {Array} historico - Lista de compras
- * @param {boolean} carregando - Estado de carregamento
+ * Histórico de compras no formato de "nota de mercado"
  */
-function Historico({ historico, carregando }) {
+function Historico({ historico, carregando, deletarCompra }) {
   // ==============================
-  // ESTADO DE CARREGAMENTO
+  // ESTADO - COMPRA ABERTA
+  // ==============================
+  const [compraAberta, setCompraAberta] = useState(null);
+
+  // ==============================
+  // CARREGANDO
   // ==============================
   if (carregando) {
-    return <div className="mt-6 p-4 text-center">Carregando histórico...</div>;
-  }
-
-  // ==============================
-  // SEM COMPRAS REGISTRADAS
-  // ==============================
-  if (!historico.length) {
     return (
-      <div className="mt-6 rounded-xl bg-white p-4 text-center shadow">
-        <h2 className="mb-2 text-xl font-bold">Histórico de Compras</h2>
-
-        <p className="text-gray-500">Nenhuma compra finalizada ainda.</p>
+      <div className="mt-6 text-center text-gray-600">
+        Carregando histórico...
       </div>
     );
   }
 
   // ==============================
-  // LISTA DE COMPRAS
+  // VAZIO
+  // ==============================
+  if (!historico?.length) {
+    return (
+      <div className="mt-6 text-center text-gray-500">
+        Nenhuma compra encontrada
+      </div>
+    );
+  }
+
+  // ==============================
+  // RENDER
   // ==============================
   return (
-    <section className="mt-6">
-      {/* Título */}
-      <h2 className="mb-4 text-2xl font-bold">Histórico de Compras</h2>
+    <div className="space-y-4 mt-6">
+      {historico.map((compra) => {
+        const total = Number(compra.total || 0);
 
-      {/* Lista */}
-      <div className="space-y-4">
-        {historico.map((compra) => (
-          <div key={compra.id} className="rounded-xl bg-white p-4 shadow">
-            {/* Cabeçalho da compra */}
-            <div className="mb-2 flex items-start justify-between">
-              <div>
-                {/* Nome do estabelecimento */}
-                <h3 className="text-lg font-semibold">
-                  {compra.estabelecimento}
-                </h3>
+        return (
+          <div key={compra.id} className="bg-white p-4 rounded-xl shadow">
+            {/* ============================== */}
+            {/* CABEÇALHO DA COMPRA */}
+            {/* ============================== */}
+            <div className="flex justify-between items-start">
+              {/* ÁREA CLICÁVEL */}
+              <div
+                className="cursor-pointer flex-1"
+                onClick={() =>
+                  setCompraAberta(compraAberta === compra.id ? null : compra.id)
+                }
+              >
+                <h3 className="font-bold">{compra.estabelecimento}</h3>
 
-                {/* Data da compra */}
                 <p className="text-sm text-gray-500">
-                  {new Date(compra.data).toLocaleDateString("pt-BR", {
-                    day: "2-digit",
-                    month: "2-digit",
-                    year: "numeric",
-                  })}
+                  {new Date(compra.data).toLocaleDateString("pt-BR")}
+                </p>
+
+                <p className="font-bold text-green-600">
+                  R$ {total.toFixed(2)}
+                </p>
+
+                {/* ============================== */}
+                {/* 🔥 MENSAGEM RESTAURADA */}
+                {/* ============================== */}
+                <p className="text-xs text-gray-400 mt-1">
+                  Clique para ver os detalhes
                 </p>
               </div>
 
-              {/* Valor total */}
-              <span className="text-lg font-bold text-green-600">
-                R$ {Number(compra.total || 0).toFixed(2)}
-              </span>
+              {/* ============================== */}
+              {/* BOTÃO EXCLUIR */}
+              {/* ============================== */}
+              <button
+                onClick={() => deletarCompra(compra.id)}
+                className="text-red-500 hover:text-red-700"
+                title="Excluir compra"
+              >
+                <Trash2 size={18} />
+              </button>
             </div>
 
-            {/* Quantidade de itens */}
-            <p className="text-sm text-gray-600">
-              {compra.itens?.length || 0} item(ns)
-            </p>
+            {/* ============================== */}
+            {/* DETALHES DA COMPRA */}
+            {/* ============================== */}
+            {compraAberta === compra.id && (
+              <div className="mt-3 border-t pt-3 space-y-2">
+                {/* CABEÇALHO ITENS */}
+                <div className="text-xs text-gray-500 flex justify-between">
+                  <span>Item</span>
+                  <span>Total</span>
+                </div>
+
+                {/* ITENS */}
+                {compra.itens?.map((item) => {
+                  const subtotal =
+                    Number(item.quantidade || 0) *
+                    Number(item.precoUnitario || 0);
+
+                  return (
+                    <div key={item.id} className="flex justify-between text-sm">
+                      <span>
+                        {item.quantidade}x {item.nome}
+                      </span>
+
+                      <span>R$ {subtotal.toFixed(2)}</span>
+                    </div>
+                  );
+                })}
+
+                {/* TOTAL FINAL */}
+                <div className="border-t pt-2 flex justify-between font-bold">
+                  <span>Total</span>
+                  <span>R$ {total.toFixed(2)}</span>
+                </div>
+              </div>
+            )}
           </div>
-        ))}
-      </div>
-    </section>
+        );
+      })}
+    </div>
   );
 }
 

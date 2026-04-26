@@ -1,27 +1,29 @@
 // ==============================
-// TELA DE LOGIN (GOOGLE MODERNA)
+// TELA DE LOGIN GOOGLE
 // ==============================
 
+// Hook de autenticação
 import { useAuth } from "../hooks/useAuth";
 
 export default function Login() {
+  // Estados do usuário
   const { usuario, entrarComGoogle, sair } = useAuth();
 
   // ==============================
-  // SE JÁ LOGADO
+  // SE USUÁRIO JÁ ESTIVER LOGADO
   // ==============================
   if (usuario) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-emerald-500 to-green-700 p-4">
         <div className="bg-white rounded-2xl shadow-xl p-6 w-full max-w-sm text-center">
-          {/* FOTO */}
+          {/* FOTO DO USUÁRIO */}
           <img
             src={usuario.photoURL}
             alt="Usuário"
             className="w-20 h-20 rounded-full mx-auto border-4 border-emerald-500"
           />
 
-          {/* NOME */}
+          {/* NOME DO USUÁRIO */}
           <h2 className="mt-4 text-lg font-bold text-gray-800">
             {usuario.displayName}
           </h2>
@@ -46,7 +48,7 @@ export default function Login() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-emerald-500 to-green-700 p-4">
       <div className="bg-white rounded-2xl shadow-xl p-6 w-full max-w-sm text-center">
-        {/* ÍCONE / LOGO */}
+        {/* ÍCONE */}
         <div className="text-5xl mb-4">🛒</div>
 
         {/* TÍTULO */}

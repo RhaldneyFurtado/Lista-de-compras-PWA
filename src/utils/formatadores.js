@@ -1,27 +1,20 @@
 // ==============================
-// FORMATA PREÇO (centavos → R$)
+// FORMATAÇÃO MONETÁRIA
 // ==============================
-export function formatarMoeda(valor) {
-  const numero = Number(valor) || 0;
 
-  return new Intl.NumberFormat("pt-BR", {
-    style: "currency",
-    currency: "BRL",
-  }).format(numero);
+export function formatarMoeda(valor) {
+  return Number(valor || 0).toLocaleString("pt-BR", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
 }
 
 // ==============================
-// CONVERTE "10,50" → 1050
+// INPUT → NUMBER
 // ==============================
-export function precoParaCentavos(valor) {
+
+export function inputParaNumero(valor) {
   if (!valor) return 0;
 
-  return Math.round(Number(String(valor).replace(",", ".")) * 100);
-}
-
-// ==============================
-// CENTAVOS → "10,50"
-// ==============================
-export function centavosParaPreco(valor) {
-  return (valor / 100).toFixed(2).replace(".", ",");
+  return Number(valor.replace(/\./g, "").replace(",", ".")) || 0;
 }

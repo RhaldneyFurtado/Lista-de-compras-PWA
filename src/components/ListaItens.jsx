@@ -50,16 +50,17 @@ export default function ListaItens({
             /* MODO PLANEJAMENTO */
             <div className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm">
               <div className="flex items-center justify-between gap-3">
-                {/* Lado esquerdo */}
+                {/* LADO ESQUERDO */}
                 <div className="flex flex-1 items-center gap-3">
-                  <input
-                    type="checkbox"
-                    checked={item.comprado}
-                    onChange={() => aoAlternarComprado(item.id)}
-                    className="h-5 w-5 accent-emerald-500"
-                  />
+                  {/* CHECKBOX + NOME AGRUPADOS */}
+                  <div className="flex items-center gap-3">
+                    <input
+                      type="checkbox"
+                      checked={item.comprado}
+                      onChange={() => aoAlternarComprado(item.id)}
+                      className="h-5 w-5 accent-emerald-500"
+                    />
 
-                  <div className="flex-1">
                     <p
                       className={`font-medium ${
                         item.comprado
@@ -69,29 +70,27 @@ export default function ListaItens({
                     >
                       {item.nome}
                     </p>
+                  </div>
 
-                    {/* Quantidade editável */}
-                    <div className="mt-2 flex items-center gap-2">
-                      <label className="text-sm text-gray-500">
-                        Quantidade:
-                      </label>
+                  {/* QUANTIDADE */}
+                  <div className="ml-6 flex items-center gap-2">
+                    <label className="text-sm text-gray-500">Quantidade:</label>
 
-                      <input
-                        type="number"
-                        min="1"
-                        value={item.quantidade}
-                        onChange={(e) =>
-                          aoAtualizar(item.id, {
-                            quantidade: Number(e.target.value) || 1,
-                          })
-                        }
-                        className="w-20 rounded border border-gray-300 px-2 py-1 text-center focus:border-emerald-500 focus:outline-none"
-                      />
-                    </div>
+                    <input
+                      type="number"
+                      min="1"
+                      value={item.quantidade}
+                      onChange={(e) =>
+                        aoAtualizar(item.id, {
+                          quantidade: Number(e.target.value) || 1,
+                        })
+                      }
+                      className="w-20 rounded border border-gray-300 px-2 py-1 text-center focus:border-emerald-500 focus:outline-none"
+                    />
                   </div>
                 </div>
 
-                {/* Botão remover */}
+                {/* BOTÃO REMOVER */}
                 <button
                   onClick={() => aoRemover(item.id)}
                   className="rounded-lg p-2 text-red-500 transition-colors hover:bg-red-50 hover:text-red-700"

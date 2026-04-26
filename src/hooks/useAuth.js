@@ -4,30 +4,21 @@
 
 import { useState, useEffect } from "react";
 
-// ==============================
-// FIREBASE AUTH
-// ==============================
 import { signInWithPopup, signOut, onAuthStateChanged } from "firebase/auth";
 
-// ==============================
-// FIRESTORE
-// ==============================
 import { doc, setDoc } from "firebase/firestore";
 
-// ==============================
-// CONFIGURAÇÕES FIREBASE
-// ==============================
 import { auth, db, googleProvider } from "../services/firebase";
 
 export function useAuth() {
   // ==============================
-  // ESTADO DO USUÁRIO LOGADO
+  // ESTADOS
   // ==============================
   const [usuario, setUsuario] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   // ==============================
-  // SALVAR/ATUALIZAR USUÁRIO
-  // NO FIRESTORE
+  // SALVAR USUÁRIO
   // ==============================
   const salvarUsuarioFirestore = async (user) => {
     if (!user) return;
@@ -44,39 +35,35 @@ export function useAuth() {
         { merge: true },
       );
     } catch (error) {
-      console.error("Erro ao salvar usuário no Firestore:", error);
+      console.error("Erro ao salvar usuário:", error);
     }
   };
 
   // ==============================
-  // MONITOR DE AUTENTICAÇÃO
+  // LISTENER AUTH (FONTE ÚNICA)
   // ==============================
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
-      if (user) {
-        // Salva dados no Firestore
-        await salvarUsuarioFirestore(user);
+      setUsuario(user || null);
 
-        // Atualiza estado local
-        setUsuario(user);
-      } else {
-        setUsuario(null);
+      if (user) {
+        await salvarUsuarioFirestore(user);
       }
+
+      setLoading(false);
     });
 
     return () => unsubscribe();
   }, []);
 
   // ==============================
-  // LOGIN COM GOOGLE
+  // LOGIN GOOGLE
   // ==============================
   const entrarComGoogle = async () => {
     try {
-      const resultado = await signInWithPopup(auth, googleProvider);
-
-      await salvarUsuarioFirestore(resultado.user);
+      await signInWithPopup(auth, googleProvider);
     } catch (error) {
-      console.error("Erro ao fazer login com Google:", error);
+      console.error("Erro login Google:", error);
     }
   };
 
@@ -87,12 +74,13 @@ export function useAuth() {
     try {
       await signOut(auth);
     } catch (error) {
-      console.error("Erro ao sair:", error);
+      console.error("Erro logout:", error);
     }
   };
 
   return {
     usuario,
+    loading,
     entrarComGoogle,
     sair,
   };
