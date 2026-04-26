@@ -3,7 +3,6 @@
 // ==============================
 
 import { useState, useEffect } from "react";
-
 import { db } from "../services/firebase";
 import { doc, getDoc, setDoc } from "firebase/firestore";
 
@@ -33,26 +32,9 @@ export function useListaFirestore(usuario) {
           const data = snap.data();
 
           setLista({
-            // ==============================
-            // MODO
-            // ==============================
-            modo: String(data.modo || "planejamento")
-              .toLowerCase()
-              .trim(),
-
-            // ==============================
-            // ESTABELECIMENTO
-            // ==============================
+            modo: String(data.modo || "planejamento").toLowerCase().trim(),
             estabelecimento: data.estabelecimento || "",
-
-            // ==============================
-            // TEMA (NOVO)
-            // ==============================
-            tema: data.tema || "claro",
-
-            // ==============================
-            // ITENS
-            // ==============================
+            tema: data.tema || "claro", // 🔥 FIX IMPORTANTE
             itens: (data.itens || []).map((item) => ({
               ...item,
               precoUnitario: Number(item.precoUnitario || 0),
@@ -96,9 +78,8 @@ export function useListaFirestore(usuario) {
 
         await setDoc(ref, {
           ...lista,
-          modo: String(lista.modo || "planejamento")
-            .toLowerCase()
-            .trim(),
+          modo: String(lista.modo || "planejamento").toLowerCase().trim(),
+          tema: lista.tema || "claro",
         });
       } catch (error) {
         console.error("Erro ao salvar lista:", error);
@@ -108,9 +89,6 @@ export function useListaFirestore(usuario) {
     return () => clearTimeout(timeout);
   }, [lista, uid, loading]);
 
-  // ==============================
-  // EXPORT
-  // ==============================
   return {
     lista,
     setLista,
