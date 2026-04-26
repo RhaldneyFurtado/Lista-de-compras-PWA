@@ -1,10 +1,10 @@
 // ==============================
-// IMPORTAÇÕES
+// IMPORTA ÍCONES
 // ==============================
 import { ShoppingCart, Trash2, LogOut, User } from "lucide-react";
 
 // ==============================
-// CABEÇALHO
+// COMPONENTE - CABEÇALHO
 // ==============================
 export default function Cabecalho({
   estabelecimento,
@@ -15,23 +15,10 @@ export default function Cabecalho({
   tema,
   aoDefinirTema,
 }) {
-  const temaAtual = tema || "claro";
+  const temaSeguro = tema || "claro";
 
   return (
     <header className="bg-emerald-600 text-white shadow-lg">
-
-      {/* ============================== */}
-      {/* BOTÃO TEMA (GARANTIDO VISÍVEL) */}
-      {/* ============================== */}
-      <button
-        onClick={() =>
-          aoDefinirTema(temaAtual === "escuro" ? "claro" : "escuro")
-        }
-        className="fixed top-3 left-3 z-50 bg-emerald-800 p-3 rounded-full shadow-lg"
-        title="Alternar tema"
-      >
-        {temaAtual === "escuro" ? "☀️" : "🌙"}
-      </button>
 
       <div className="mx-auto max-w-4xl px-4 py-4">
 
@@ -53,13 +40,26 @@ export default function Cabecalho({
           </div>
 
           {/* AÇÕES */}
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 justify-end sm:ml-auto">
+
+            {/* TEMA (FORÇADO VISUALMENTE SEM DEPENDER DE NADA EXTERNO) */}
+            <button
+              onClick={() => {
+                const novo = temaSeguro === "escuro" ? "claro" : "escuro";
+                aoDefinirTema?.(novo);
+              }}
+              className="rounded-lg bg-emerald-700 p-2 hover:bg-emerald-800"
+              title="Tema"
+            >
+              {temaSeguro === "escuro" ? "☀️" : "🌙"}
+            </button>
 
             {/* USUÁRIO */}
-            <div className="h-10 w-10 flex items-center justify-center rounded-full bg-emerald-700 overflow-hidden">
+            <div className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-full border-2 border-white bg-emerald-700 shrink-0">
               {usuario?.photoURL ? (
                 <img
                   src={usuario.photoURL}
+                  alt="Usuário"
                   className="h-full w-full object-cover"
                   referrerPolicy="no-referrer"
                 />
@@ -69,12 +69,20 @@ export default function Cabecalho({
             </div>
 
             {/* LOGOUT */}
-            <button onClick={aoLogout}>
+            <button
+              onClick={aoLogout}
+              className="rounded-lg bg-emerald-700 p-2 hover:bg-emerald-800 shrink-0"
+              title="Sair"
+            >
               <LogOut size={20} />
             </button>
 
             {/* LIMPAR */}
-            <button onClick={aoLimpar}>
+            <button
+              onClick={aoLimpar}
+              className="rounded-lg bg-emerald-700 p-2 hover:bg-emerald-800 shrink-0"
+              title="Limpar lista"
+            >
               <Trash2 size={20} />
             </button>
 
@@ -84,10 +92,11 @@ export default function Cabecalho({
 
         {/* INPUT */}
         <input
+          type="text"
           value={estabelecimento}
           onChange={(e) => aoDefinirEstabelecimento(e.target.value)}
           placeholder="Nome do mercado..."
-          className="w-full rounded-lg bg-emerald-700 px-3 py-2 text-white"
+          className="w-full rounded-lg bg-emerald-700 px-3 py-2 text-white placeholder-emerald-200 focus:outline-none focus:ring-2 focus:ring-emerald-300"
         />
 
       </div>
