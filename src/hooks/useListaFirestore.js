@@ -33,13 +33,26 @@ export function useListaFirestore(usuario) {
           const data = snap.data();
 
           setLista({
-            // 🔥 CORREÇÃO IMPORTANTE (NORMALIZAÇÃO)
+            // ==============================
+            // MODO
+            // ==============================
             modo: String(data.modo || "planejamento")
               .toLowerCase()
               .trim(),
 
+            // ==============================
+            // ESTABELECIMENTO
+            // ==============================
             estabelecimento: data.estabelecimento || "",
 
+            // ==============================
+            // TEMA (NOVO)
+            // ==============================
+            tema: data.tema || "claro",
+
+            // ==============================
+            // ITENS
+            // ==============================
             itens: (data.itens || []).map((item) => ({
               ...item,
               precoUnitario: Number(item.precoUnitario || 0),
@@ -50,6 +63,7 @@ export function useListaFirestore(usuario) {
           setLista({
             modo: "planejamento",
             estabelecimento: "",
+            tema: "claro",
             itens: [],
           });
         }
@@ -59,6 +73,7 @@ export function useListaFirestore(usuario) {
         setLista({
           modo: "planejamento",
           estabelecimento: "",
+          tema: "claro",
           itens: [],
         });
       } finally {
