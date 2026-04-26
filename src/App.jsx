@@ -32,18 +32,14 @@ function App() {
   const [aba, setAba] = useState("compras");
 
   // ==============================
-  // TEMA (ÚNICA FONTE DE VERDADE)
+  // TEMA ÚNICO
   // ==============================
   const [tema, setTema] = useState("claro");
 
-  // sincroniza Firestore → estado local
   useEffect(() => {
-    if (lista?.tema) {
-      setTema(lista.tema);
-    }
+    if (lista?.tema) setTema(lista.tema);
   }, [lista?.tema]);
 
-  // aplica no body
   useEffect(() => {
     document.body.classList.remove("tema-claro", "tema-escuro");
     document.body.classList.add(
@@ -140,13 +136,8 @@ function App() {
           setLista((p) => ({ ...p, itens: [] }))
         }
         aoLogout={fazerLogout}
-
-        // 🔥 TEMA (ÚNICO)
         tema={tema}
-        aoDefinirTema={(v) => {
-          setTema(v);
-          setLista((p) => ({ ...p, tema: v }));
-        }}
+        aoDefinirTema={setTema}
       />
 
       <main className="mx-auto max-w-4xl space-y-6 px-4 py-6">
@@ -161,112 +152,4 @@ function App() {
                 : "bg-white text-gray-700"
             }`}
           >
-            Compras
-          </button>
-
-          <button
-            onClick={() => setAba("historico")}
-            className={`flex-1 p-3 rounded-lg font-semibold ${
-              aba === "historico"
-                ? "bg-emerald-600 text-white"
-                : "bg-white text-gray-700"
-            }`}
-          >
-            Histórico
-          </button>
-
-        </div>
-
-        {aba === "compras" && (
-          <>
-            <AlternarModo
-              modo={lista.modo}
-              aoAlternar={(m) =>
-                setLista((p) => ({ ...p, modo: m }))
-              }
-            />
-
-            <FormAdicionar
-              aoAdicionar={(d) =>
-                setLista((p) => ({
-                  ...p,
-                  itens: [
-                    ...p.itens,
-                    {
-                      id: Date.now().toString(),
-                      nome: d.nome,
-                      quantidade: d.quantidade,
-                      precoUnitario: 0,
-                      comprado: false,
-                    },
-                  ],
-                }))
-              }
-            />
-
-            <ListaItens
-              itens={itens}
-              modo={lista.modo}
-              aoAtualizar={(id, dados) =>
-                setLista((p) => ({
-                  ...p,
-                  itens: p.itens.map((i) =>
-                    i.id === id ? { ...i, ...dados } : i
-                  ),
-                }))
-              }
-              aoRemover={(id) =>
-                setLista((p) => ({
-                  ...p,
-                  itens: p.itens.filter((i) => i.id !== id),
-                }))
-              }
-              aoAlternarComprado={(id) =>
-                setLista((p) => ({
-                  ...p,
-                  itens: p.itens.map((i) =>
-                    i.id === id
-                      ? { ...i, comprado: !i.comprado }
-                      : i
-                  ),
-                }))
-              }
-            />
-
-            <ResumoTotal
-              totais={{
-                total: itens.reduce(
-                  (acc, i) =>
-                    acc +
-                    (i.quantidade || 0) * (i.precoUnitario || 0),
-                  0
-                ),
-                quantidadeItens: itens.length,
-                itensComprados: itens.filter((i) => i.comprado).length,
-              }}
-            />
-
-            {itens.length > 0 && (
-              <button
-                onClick={finalizarCompra}
-                className="w-full bg-emerald-600 text-white p-4 rounded-lg"
-              >
-                Finalizar Compra
-              </button>
-            )}
-          </>
-        )}
-
-        {aba === "historico" && (
-          <Historico
-            historico={historico}
-            carregando={carregando}
-            deletarCompra={deletarCompra}
-          />
-        )}
-      </main>
-    </div>
-  );
-}
-
-export default App;
+            Compr
