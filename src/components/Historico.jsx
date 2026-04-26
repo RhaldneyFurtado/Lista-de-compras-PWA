@@ -10,7 +10,7 @@ import { Trash2 } from "lucide-react";
  */
 function Historico({ historico, carregando, deletarCompra }) {
   // ==============================
-  // ESTADO - COMPRA ABERTA
+  // ESTADO
   // ==============================
   const [compraAberta, setCompraAberta] = useState(null);
 
@@ -40,21 +40,23 @@ function Historico({ historico, carregando, deletarCompra }) {
   // RENDER
   // ==============================
   return (
-    <div className="space-y-4 mt-6">
+    <div className="mt-6 space-y-4">
       {historico.map((compra) => {
         const total = Number(compra.total || 0);
 
         return (
-          <div key={compra.id} className="bg-white p-4 rounded-xl shadow">
-            {/* ============================== */}
-            {/* CABEÇALHO DA COMPRA */}
-            {/* ============================== */}
-            <div className="flex justify-between items-start">
-              {/* ÁREA CLICÁVEL */}
+          <div key={compra.id} className="rounded-xl bg-white p-4 shadow">
+
+            {/* CABEÇALHO */}
+            <div className="flex items-start justify-between">
+
+              {/* INFO CLICK */}
               <div
-                className="cursor-pointer flex-1"
+                className="flex-1 cursor-pointer"
                 onClick={() =>
-                  setCompraAberta(compraAberta === compra.id ? null : compra.id)
+                  setCompraAberta(
+                    compraAberta === compra.id ? null : compra.id
+                  )
                 }
               >
                 <h3 className="font-bold">{compra.estabelecimento}</h3>
@@ -67,33 +69,26 @@ function Historico({ historico, carregando, deletarCompra }) {
                   R$ {total.toFixed(2)}
                 </p>
 
-                {/* ============================== */}
-                {/* 🔥 MENSAGEM RESTAURADA */}
-                {/* ============================== */}
-                <p className="text-xs text-gray-400 mt-1">
+                <p className="mt-1 text-xs text-gray-400">
                   Clique para ver os detalhes
                 </p>
               </div>
 
-              {/* ============================== */}
-              {/* BOTÃO EXCLUIR */}
-              {/* ============================== */}
+              {/* LIXEIRA */}
               <button
                 onClick={() => deletarCompra(compra.id)}
                 className="text-red-500 hover:text-red-700"
-                title="Excluir compra"
               >
                 <Trash2 size={18} />
               </button>
             </div>
 
-            {/* ============================== */}
-            {/* DETALHES DA COMPRA */}
-            {/* ============================== */}
+            {/* DETALHES */}
             {compraAberta === compra.id && (
-              <div className="mt-3 border-t pt-3 space-y-2">
-                {/* CABEÇALHO ITENS */}
-                <div className="text-xs text-gray-500 flex justify-between">
+              <div className="mt-3 space-y-2 border-t pt-3">
+
+                {/* HEADER */}
+                <div className="flex justify-between text-xs text-gray-500">
                   <span>Item</span>
                   <span>Total</span>
                 </div>
@@ -105,7 +100,10 @@ function Historico({ historico, carregando, deletarCompra }) {
                     Number(item.precoUnitario || 0);
 
                   return (
-                    <div key={item.id} className="flex justify-between text-sm">
+                    <div
+                      key={item.id}
+                      className="flex justify-between text-sm"
+                    >
                       <span>
                         {item.quantidade}x {item.nome}
                       </span>
@@ -115,8 +113,8 @@ function Historico({ historico, carregando, deletarCompra }) {
                   );
                 })}
 
-                {/* TOTAL FINAL */}
-                <div className="border-t pt-2 flex justify-between font-bold">
+                {/* TOTAL */}
+                <div className="flex justify-between border-t pt-2 font-bold">
                   <span>Total</span>
                   <span>R$ {total.toFixed(2)}</span>
                 </div>
