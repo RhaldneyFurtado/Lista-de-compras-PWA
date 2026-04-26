@@ -2,7 +2,7 @@
 // IMPORTAÇÕES
 // ==============================
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 import { useAuth } from "./hooks/useAuth";
 import { useListaFirestore } from "./hooks/useListaFirestore";
@@ -19,11 +19,21 @@ import ResumoTotal from "./components/ResumoTotal";
 import Login from "./components/Login";
 import Historico from "./components/Historico";
 
+// ==============================
+// FUNÇÃO AUXILIAR
+// ==============================
 function capitalizarTexto(texto) {
   if (!texto) return "";
-  return texto.trim().toLowerCase().replace(/(^|\s)\S/g, (l) => l.toUpperCase());
+
+  return texto
+    .trim()
+    .toLowerCase()
+    .replace(/(^|\s)\S/g, (letra) => letra.toUpperCase());
 }
 
+// ==============================
+// APP
+// ==============================
 function App() {
   const { usuario, loading } = useAuth();
 
@@ -36,21 +46,55 @@ function App() {
 
   const [aba, setAba] = useState("compras");
 
-  if (loading) return <p>Carregando...</p>;
-  if (!usuario) return <Login />;
-  if (!lista || !setLista) return <p>Carregando lista...</p>;
-
-  const itens = lista.itens || [];
-
+  // ==============================
+  // LOGOUT
+  // ==============================
   const fazerLogout = async () => {
     await signOut(auth);
   };
 
+  // ==============================
+  // TEMA GLOBAL (APLICAÇÃO VISUAL)
+  // ==============================
+  useEffect(() => {
+    if (!lista?.tema) return;
+
+    document.body.className =
+      lista.tema === "escuro" ? "tema-escuro" : "tema-claro";
+  }, [lista?.tema]);
+
+  // ==============================
+  // LOADING AUTH
+  // ==============================
+  if (loading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <p>Carregando...</p>
+      </div>
+    );
+  }
+
+  if (!usuario) return <Login />;
+
+  if (!lista || !setLista) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <p>Carregando lista...</p>
+      </div>
+    );
+  }
+
+  const itens = lista.itens || [];
+
+  // ==============================
+  // FINALIZAR COMPRA
+  // ==============================
   const finalizarCompra = async () => {
     if (!itens.length) return;
 
     const total = itens.reduce(
-      (acc, i) => acc + i.quantidade * i.precoUnitario,
+      (acc, item) =>
+        acc + (item.quantidade || 0) * (item.precoUnitario || 0),
       0,
     );
 
@@ -72,44 +116,86 @@ function App() {
     await setDoc(doc(db, "users", usuario.uid, "lista", "dados"), {
       modo: "planejamento",
       estabelecimento: "",
+      tema: lista.tema || "claro",
       itens: [],
     });
 
     setLista({
       modo: "planejamento",
       estabelecimento: "",
+      tema: lista.tema || "claro",
       itens: [],
     });
 
     setAba("historico");
   };
 
+  // ==============================
+  // RENDER
+  // ==============================
   return (
     <div className="min-h-screen bg-gray-50">
       <Cabecalho
         usuario={usuario}
         estabelecimento={lista.estabelecimento || ""}
-        aoDefinirEstabelecimento={(v) =>
-          setLista((p) => ({ ...p, estabelecimento: v }))
+        aoDefinirEstabelecimento={(valor) =>
+          setLista((prev) => ({ ...prev, estabelecimento: valor }))
         }
-        aoLimpar={() => setLista((p) => ({ ...p, itens: [] }))}
+        aoLimpar={() => setLista((prev) => ({ ...prev, itens: [] }))}
         aoLogout={fazerLogout}
+        tema={lista.tema}
+        aoDefinirTema={(valor) =>
+          setLista((prev) => ({ ...prev, tema: valor }))
+        }
       />
 
       <main className="mx-auto max-w-4xl space-y-6 px-4 py-6">
+
+        {/* ============================== */}
+        {/* NAVEGAÇÃO */}
+        {/* ============================== */}
         <div className="flex gap-2">
-          <button onClick={() => setAba("compras")}>Compras</button>
-          <button onClick={() => setAba("historico")}>Histórico</button>
+          <button
+            onClick={() => setAba("compras")}
+            className={`flex-1 p-3 rounded-lg font-semibold ${
+              aba === "compras"
+                ? "bg-emerald-600 text-white"
+                : "bg-white text-gray-700"
+            }`}
+          >
+            Compras
+          </button>
+
+          <button
+            onClick={() => setAba("historico")}
+            className={`flex-1 p-3 rounded-lg font-semibold ${
+              aba === "historico"
+                ? "bg-emerald-600 text-white"
+                : "bg-white text-gray-700"
+            }`}
+          >
+            Histórico
+          </button>
         </div>
 
+        {/* ============================== */}
+        {/* COMPRAS */}
+        {/* ============================== */}
         {aba === "compras" && (
           <>
+            <AlternarModo
+              modo={lista.modo}
+              aoAlternar={(modo) =>
+                setLista((prev) => ({ ...prev, modo }))
+              }
+            />
+
             <FormAdicionar
               aoAdicionar={(dados) =>
-                setLista((p) => ({
-                  ...p,
+                setLista((prev) => ({
+                  ...prev,
                   itens: [
-                    ...p.itens,
+                    ...prev.itens,
                     {
                       id: Date.now().toString(),
                       nome: capitalizarTexto(dados.nome),
@@ -126,24 +212,26 @@ function App() {
               itens={itens}
               modo={lista.modo}
               aoAtualizar={(id, dados) =>
-                setLista((p) => ({
-                  ...p,
-                  itens: p.itens.map((i) =>
+                setLista((prev) => ({
+                  ...prev,
+                  itens: prev.itens.map((i) =>
                     i.id === id ? { ...i, ...dados } : i,
                   ),
                 }))
               }
               aoRemover={(id) =>
-                setLista((p) => ({
-                  ...p,
-                  itens: p.itens.filter((i) => i.id !== id),
+                setLista((prev) => ({
+                  ...prev,
+                  itens: prev.itens.filter((i) => i.id !== id),
                 }))
               }
               aoAlternarComprado={(id) =>
-                setLista((p) => ({
-                  ...p,
-                  itens: p.itens.map((i) =>
-                    i.id === id ? { ...i, comprado: !i.comprado } : i,
+                setLista((prev) => ({
+                  ...prev,
+                  itens: prev.itens.map((i) =>
+                    i.id === id
+                      ? { ...i, comprado: !i.comprado }
+                      : i,
                   ),
                 }))
               }
@@ -152,7 +240,9 @@ function App() {
             <ResumoTotal
               totais={{
                 total: itens.reduce(
-                  (a, i) => a + i.quantidade * i.precoUnitario,
+                  (acc, i) =>
+                    acc +
+                    (i.quantidade || 0) * (i.precoUnitario || 0),
                   0,
                 ),
                 quantidadeItens: itens.length,
@@ -160,12 +250,20 @@ function App() {
               }}
             />
 
-            <button onClick={finalizarCompra}>
-              Finalizar Compra
-            </button>
+            {itens.length > 0 && (
+              <button
+                onClick={finalizarCompra}
+                className="w-full bg-emerald-600 text-white p-4 rounded-lg"
+              >
+                Finalizar Compra
+              </button>
+            )}
           </>
         )}
 
+        {/* ============================== */}
+        {/* HISTÓRICO */}
+        {/* ============================== */}
         {aba === "historico" && (
           <Historico
             historico={historico}
