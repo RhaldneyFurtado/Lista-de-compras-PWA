@@ -38,13 +38,15 @@ export default function Cabecalho({
           </div>
 
           {/* AÇÕES */}
-          <div className="flex items-center gap-3 sm:ml-auto justify-end">
+          <div className="flex items-center gap-3 justify-end sm:ml-auto">
 
             {/* TEMA */}
             <button
-              onClick={() =>
-                aoDefinirTema?.(tema === "escuro" ? "claro" : "escuro")
-              }
+              onClick={() => {
+                const novo = tema === "escuro" ? "claro" : "escuro";
+
+                aoDefinirTema(novo);
+              }}
               className="rounded-lg bg-emerald-700 p-2 hover:bg-emerald-800"
               title="Tema"
             >
