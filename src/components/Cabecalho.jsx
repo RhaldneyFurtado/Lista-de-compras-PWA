@@ -1,10 +1,7 @@
-// ==============================
-// IMPORTA ÍCONES
-// ==============================
 import { ShoppingCart, Trash2, LogOut, User } from "lucide-react";
 
 // ==============================
-// COMPONENTE - CABEÇALHO
+// CABEÇALHO
 // ==============================
 export default function Cabecalho({
   estabelecimento,
@@ -15,6 +12,8 @@ export default function Cabecalho({
   tema,
   aoDefinirTema,
 }) {
+  const temaSeguro = tema ?? "claro";
+
   return (
     <header className="bg-emerald-600 text-white shadow-lg">
 
@@ -43,18 +42,19 @@ export default function Cabecalho({
             {/* TEMA */}
             <button
               onClick={() => {
-                const novo = tema === "escuro" ? "claro" : "escuro";
+                const novo =
+                  temaSeguro === "escuro" ? "claro" : "escuro";
 
                 aoDefinirTema(novo);
               }}
               className="rounded-lg bg-emerald-700 p-2 hover:bg-emerald-800"
               title="Tema"
             >
-              {tema === "escuro" ? "☀️" : "🌙"}
+              {temaSeguro === "escuro" ? "☀️" : "🌙"}
             </button>
 
             {/* USUÁRIO */}
-            <div className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-full border-2 border-white bg-emerald-700 shrink-0">
+            <div className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-full border-2 border-white bg-emerald-700">
               {usuario?.photoURL ? (
                 <img
                   src={usuario.photoURL}
@@ -70,8 +70,7 @@ export default function Cabecalho({
             {/* LOGOUT */}
             <button
               onClick={aoLogout}
-              className="rounded-lg bg-emerald-700 p-2 hover:bg-emerald-800 shrink-0"
-              title="Sair"
+              className="rounded-lg bg-emerald-700 p-2 hover:bg-emerald-800"
             >
               <LogOut size={20} />
             </button>
@@ -79,8 +78,7 @@ export default function Cabecalho({
             {/* LIMPAR */}
             <button
               onClick={aoLimpar}
-              className="rounded-lg bg-emerald-700 p-2 hover:bg-emerald-800 shrink-0"
-              title="Limpar lista"
+              className="rounded-lg bg-emerald-700 p-2 hover:bg-emerald-800"
             >
               <Trash2 size={20} />
             </button>
@@ -95,7 +93,7 @@ export default function Cabecalho({
           value={estabelecimento}
           onChange={(e) => aoDefinirEstabelecimento(e.target.value)}
           placeholder="Nome do mercado..."
-          className="w-full rounded-lg bg-emerald-700 px-3 py-2 text-white placeholder-emerald-200 focus:outline-none focus:ring-2 focus:ring-emerald-300"
+          className="w-full rounded-lg bg-emerald-700 px-3 py-2 text-white"
         />
 
       </div>
