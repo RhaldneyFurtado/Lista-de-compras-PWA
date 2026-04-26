@@ -32,14 +32,17 @@ function App() {
   const [aba, setAba] = useState("compras");
 
   // ==============================
-  // TEMA (SIMPLES E DIRETO)
+  // TEMA LOCAL (NÃO DEPENDE DO FIRESTORE DIRETO)
   // ==============================
   const [tema, setTema] = useState("claro");
 
+  // só sincroniza quando lista existir (SEM travar render)
   useEffect(() => {
-    if (lista?.tema) setTema(lista.tema);
-  }, [lista?.tema]);
+    if (!lista) return;
+    if (lista.tema) setTema(lista.tema);
+  }, [lista]);
 
+  // aplica tema no DOM
   useEffect(() => {
     document.body.classList.remove("tema-claro", "tema-escuro");
     document.body.classList.add(
@@ -54,9 +57,6 @@ function App() {
     await signOut(auth);
   };
 
-  // ==============================
-  // LOADING
-  // ==============================
   if (loading) {
     return (
       <div className="flex min-h-screen items-center justify-center">
@@ -129,21 +129,27 @@ function App() {
       <Cabecalho
         usuario={usuario}
         estabelecimento={lista.estabelecimento || ""}
+
         aoDefinirEstabelecimento={(v) =>
           setLista((p) => ({ ...p, estabelecimento: v }))
         }
+
         aoLimpar={() =>
           setLista((p) => ({ ...p, itens: [] }))
         }
+
         aoLogout={fazerLogout}
+
         tema={tema}
-        aoDefinirTema={setTema}
+        aoDefinirTema={(v) => {
+          setTema(v);
+          setLista((p) => ({ ...p, tema: v }));
+        }}
       />
 
       <main className="mx-auto max-w-4xl space-y-6 px-4 py-6">
 
         <div className="flex gap-2">
-
           <button
             onClick={() => setAba("compras")}
             className={`flex-1 p-3 rounded-lg font-semibold ${
@@ -165,7 +171,6 @@ function App() {
           >
             Histórico
           </button>
-
         </div>
 
         {aba === "compras" && (
@@ -195,34 +200,7 @@ function App() {
               }
             />
 
-            <ListaItens
-              itens={itens}
-              modo={lista.modo}
-              aoAtualizar={(id, dados) =>
-                setLista((p) => ({
-                  ...p,
-                  itens: p.itens.map((i) =>
-                    i.id === id ? { ...i, ...dados } : i
-                  ),
-                }))
-              }
-              aoRemover={(id) =>
-                setLista((p) => ({
-                  ...p,
-                  itens: p.itens.filter((i) => i.id !== id),
-                }))
-              }
-              aoAlternarComprado={(id) =>
-                setLista((p) => ({
-                  ...p,
-                  itens: p.itens.map((i) =>
-                    i.id === id
-                      ? { ...i, comprado: !i.comprado }
-                      : i
-                  ),
-                }))
-              }
-            />
+            <ListaItens itens={itens} />
 
             <ResumoTotal
               totais={{
@@ -236,15 +214,6 @@ function App() {
                 itensComprados: itens.filter((i) => i.comprado).length,
               }}
             />
-
-            {itens.length > 0 && (
-              <button
-                onClick={finalizarCompra}
-                className="w-full bg-emerald-600 text-white p-4 rounded-lg"
-              >
-                Finalizar Compra
-              </button>
-            )}
           </>
         )}
 
@@ -255,7 +224,6 @@ function App() {
             deletarCompra={deletarCompra}
           />
         )}
-
       </main>
     </div>
   );
