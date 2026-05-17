@@ -1,5 +1,5 @@
 // ==============================
-// LISTA FIRESTORE
+// LISTA FIRESTORE POR USUÁRIO
 // ==============================
 
 import { useState, useEffect } from "react";
@@ -16,7 +16,7 @@ export function useListaFirestore(usuario) {
   const uid = usuario?.uid;
 
   // ==============================
-  // CARREGAR
+  // CARREGAR LISTA
   // ==============================
   useEffect(() => {
     let ativo = true;
@@ -60,8 +60,8 @@ export function useListaFirestore(usuario) {
             itens: [],
           });
         }
-      } catch (err) {
-        console.error(err);
+      } catch (error) {
+        console.error(error);
 
         if (!ativo) return;
 
@@ -84,7 +84,7 @@ export function useListaFirestore(usuario) {
   }, [uid]);
 
   // ==============================
-  // SALVAR
+  // SALVAR LISTA
   // ==============================
   useEffect(() => {
     if (!uid || !lista || loading) return;
@@ -97,8 +97,8 @@ export function useListaFirestore(usuario) {
           itens: lista.itens,
           tema: lista.tema || "claro",
         });
-      } catch (err) {
-        console.error(err);
+      } catch (error) {
+        console.error(error);
       }
     }, 400);
 
@@ -106,4 +106,4 @@ export function useListaFirestore(usuario) {
   }, [lista, uid, loading]);
 
   return { lista, setLista, loading };
-}
+          }
