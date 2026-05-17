@@ -30,42 +30,37 @@ export default defineConfig({
       // WORKBOX (CACHE CONTROLADO)
       // ==============================
       workbox: {
-        // arquivos cacheados
+        // ==============================
+        // ARQUIVOS CACHEADOS
+        // ==============================
         globPatterns: [
-          "**/*.{js,css,ico,png,svg}",
+          "**/*.{js,css,html,ico,png,svg}",
         ],
 
-        // remove caches antigos
+        // ==============================
+        // LIMPA CACHE ANTIGO
+        // ==============================
         cleanupOutdatedCaches: true,
 
-        // assume imediatamente o controle
+        // ==============================
+        // NOVO SERVICE WORKER
+        // ASSUME CONTROLE IMEDIATAMENTE
+        // ==============================
         clientsClaim: true,
 
-        // evita waiting state
+        // ==============================
+        // EVITA WAITING STATE
+        // ==============================
         skipWaiting: true,
-
-        // ==============================
-        // CACHE HTML (REDE PRIMEIRO)
-        // ==============================
-        runtimeCaching: [
-          {
-            urlPattern: ({ request }) =>
-              request.destination ===
-              "document",
-
-            handler: "NetworkFirst",
-
-            options: {
-              cacheName: "html-cache",
-            },
-          },
-        ],
       },
 
       // ==============================
       // MANIFESTO DO PWA
       // ==============================
       manifest: {
+        // ==============================
+        // INFORMAÇÕES DO APP
+        // ==============================
         name: "Lista de Compras Inteligente",
 
         short_name: "Compras",
@@ -73,10 +68,16 @@ export default defineConfig({
         description:
           "Organize suas compras de forma simples e rápida",
 
+        // ==============================
+        // CORES
+        // ==============================
         theme_color: "#10b981",
 
         background_color: "#ffffff",
 
+        // ==============================
+        // MODO DE EXIBIÇÃO
+        // ==============================
         display: "standalone",
 
         // ==============================
@@ -148,9 +149,14 @@ export default defineConfig({
   // BUILD FINAL
   // ==============================
   build: {
-    // reduz exposição do source
+    // ==============================
+    // DESATIVA SOURCE MAP
+    // ==============================
     sourcemap: false,
 
+    // ==============================
+    // PASTA FINAL DO BUILD
+    // ==============================
     outDir: "dist",
   },
 });
