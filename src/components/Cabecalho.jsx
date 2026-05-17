@@ -8,8 +8,6 @@ import { ShoppingCart, Trash2, LogOut, User } from "lucide-react";
 // ==============================
 export default function Cabecalho({
   usuario,
-  estabelecimento,
-  aoDefinirEstabelecimento,
   aoLimpar,
   aoLogout,
   tema,
@@ -20,28 +18,31 @@ export default function Cabecalho({
   return (
     <header className="w-full bg-emerald-600 text-white shadow-lg relative">
 
+      {/* ============================== */}
       {/* BOTÃO TEMA */}
+      {/* ============================== */}
       <button
         onClick={() => {
           const novo = temaSeguro === "escuro" ? "claro" : "escuro";
           aoDefinirTema?.(novo);
         }}
-        className={`absolute top-3 right-3 sm:top-4 sm:right-4
-          rounded-full p-3 transition-all duration-300
-          ${temaSeguro === "escuro"
+        className={`absolute top-3 right-3 sm:top-4 sm:right-4 rounded-full p-3 transition-all duration-300 ${
+          temaSeguro === "escuro"
             ? "bg-slate-800 rotate-180"
-            : "bg-emerald-800 rotate-0"
-          }`}
+            : "bg-emerald-800"
+        }`}
         title="Tema"
       >
         {temaSeguro === "escuro" ? "☀️" : "🌙"}
       </button>
 
-      {/* CONTAINER PRINCIPAL */}
-      <div className="max-w-6xl mx-auto flex flex-row items-center justify-between px-4 py-6">
+      {/* ============================== */}
+      {/* CONTAINER */}
+      {/* ============================== */}
+      <div className="max-w-6xl mx-auto px-4 py-4">
 
         {/* ============================== */}
-        {/* ESQUERDA (LOGO) */}
+        {/* LINHA 1 - LOGO */}
         {/* ============================== */}
         <div className="flex items-center gap-3">
 
@@ -49,8 +50,8 @@ export default function Cabecalho({
             <ShoppingCart className="text-white" size={30} />
           </div>
 
-          <div className="text-left">
-            <h1 className="text-lg sm:text-2xl md:text-3xl font-bold leading-tight">
+          <div>
+            <h1 className="text-xl sm:text-2xl md:text-3xl font-bold leading-tight">
               Lista de Compras
             </h1>
 
@@ -62,44 +63,48 @@ export default function Cabecalho({
         </div>
 
         {/* ============================== */}
-        {/* DIREITA (AÇÕES) */}
+        {/* LINHA 2 - AÇÕES (DIREITA COLADA) */}
         {/* ============================== */}
-        <div className="flex items-center gap-3">
+        <div className="flex justify-end mt-4">
 
-          {/* USUÁRIO */}
-          <div className="h-10 w-10 sm:h-12 sm:w-12 rounded-full overflow-hidden bg-emerald-700 flex items-center justify-center border-2 border-white">
+          <div className="flex items-center gap-3">
 
-            {usuario?.photoURL ? (
-              <img
-                src={usuario.photoURL}
-                className="h-full w-full object-cover"
-                referrerPolicy="no-referrer"
-              />
-            ) : (
-              <User size={18} />
-            )}
+            {/* USUÁRIO */}
+            <div className="h-10 w-10 sm:h-12 sm:w-12 rounded-full overflow-hidden bg-emerald-700 flex items-center justify-center border-2 border-white">
+
+              {usuario?.photoURL ? (
+                <img
+                  src={usuario.photoURL}
+                  className="h-full w-full object-cover"
+                  referrerPolicy="no-referrer"
+                />
+              ) : (
+                <User size={18} />
+              )}
+
+            </div>
+
+            {/* LOGOUT */}
+            <button
+              onClick={aoLogout}
+              className="rounded-xl bg-emerald-700 p-3 hover:bg-emerald-800 transition"
+              title="Sair"
+            >
+              <LogOut size={20} />
+            </button>
+
+            {/* LIMPAR */}
+            <button
+              onClick={aoLimpar}
+              className="rounded-xl bg-emerald-700 p-3 hover:bg-emerald-800 transition"
+              title="Limpar lista"
+            >
+              <Trash2 size={20} />
+            </button>
 
           </div>
-
-          {/* LOGOUT */}
-          <button
-            onClick={aoLogout}
-            className="rounded-xl bg-emerald-700 p-3 hover:bg-emerald-800 transition"
-            title="Sair"
-          >
-            <LogOut size={20} />
-          </button>
-
-          {/* LIMPAR */}
-          <button
-            onClick={aoLimpar}
-            className="rounded-xl bg-emerald-700 p-3 hover:bg-emerald-800 transition"
-            title="Limpar lista"
-          >
-            <Trash2 size={20} />
-          </button>
-
         </div>
+
       </div>
     </header>
   );
