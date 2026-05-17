@@ -1,5 +1,5 @@
 // ==============================
-// LISTA DO USUÁRIO NO FIRESTORE
+// LISTA FIRESTORE
 // ==============================
 
 import { useState, useEffect } from "react";
@@ -7,7 +7,7 @@ import { db } from "../services/firebase";
 import { doc, getDoc, setDoc } from "firebase/firestore";
 
 // ==============================
-// HOOK LISTA POR USUÁRIO
+// HOOK LISTA
 // ==============================
 export function useListaFirestore(usuario) {
   const [lista, setLista] = useState(null);
@@ -16,27 +16,34 @@ export function useListaFirestore(usuario) {
   const uid = usuario?.uid;
 
   // ==============================
-  // CARREGAR LISTA
+  // CARREGAR
   // ==============================
   useEffect(() => {
+    let ativo = true;
+
     if (!uid) {
-      setLista(null);
+      setLista({
+        modo: "planejamento",
+        estabelecimento: "",
+        tema: "claro",
+        itens: [],
+      });
       setLoading(false);
       return;
     }
 
     const carregar = async () => {
-      setLoading(true);
-
       try {
         const ref = doc(db, "users", uid, "lista", "dados");
         const snap = await getDoc(ref);
+
+        if (!ativo) return;
 
         if (snap.exists()) {
           const data = snap.data();
 
           setLista({
-            modo: String(data.modo || "planejamento").toLowerCase().trim(),
+            modo: String(data.modo || "planejamento").toLowerCase(),
             estabelecimento: data.estabelecimento || "",
             tema: data.tema || "claro",
             itens: (data.itens || []).map((item) => ({
@@ -53,8 +60,10 @@ export function useListaFirestore(usuario) {
             itens: [],
           });
         }
-      } catch (error) {
-        console.error(error);
+      } catch (err) {
+        console.error(err);
+
+        if (!ativo) return;
 
         setLista({
           modo: "planejamento",
@@ -63,33 +72,35 @@ export function useListaFirestore(usuario) {
           itens: [],
         });
       } finally {
-        setLoading(false);
+        if (ativo) setLoading(false);
       }
     };
 
     carregar();
+
+    return () => {
+      ativo = false;
+    };
   }, [uid]);
 
   // ==============================
-  // SALVAR LISTA
+  // SALVAR
   // ==============================
   useEffect(() => {
     if (!uid || !lista || loading) return;
 
     const timeout = setTimeout(async () => {
       try {
-        const ref = doc(db, "users", uid, "lista", "dados");
-
-        await setDoc(ref, {
+        await setDoc(doc(db, "users", uid, "lista", "dados"), {
           modo: lista.modo,
           estabelecimento: lista.estabelecimento,
           itens: lista.itens,
           tema: lista.tema || "claro",
         });
-      } catch (error) {
-        console.error(error);
+      } catch (err) {
+        console.error(err);
       }
-    }, 300);
+    }, 400);
 
     return () => clearTimeout(timeout);
   }, [lista, uid, loading]);
