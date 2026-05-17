@@ -15,6 +15,17 @@ export default function Cabecalho({
 }) {
   const temaSeguro = tema || "claro";
 
+  // ==============================
+  // ALTERAR TEMA (SEGURO)
+  // ==============================
+  const handleToggleTema = () => {
+    const novo = temaSeguro === "escuro" ? "claro" : "escuro";
+
+    if (aoDefinirTema) {
+      aoDefinirTema(novo);
+    }
+  };
+
   return (
     <header className="w-full bg-emerald-600 text-white shadow-lg">
 
@@ -51,10 +62,7 @@ export default function Cabecalho({
 
           {/* TEMA */}
           <button
-            onClick={() => {
-              const novo = temaSeguro === "escuro" ? "claro" : "escuro";
-              aoDefinirTema?.(novo);
-            }}
+            onClick={handleToggleTema}
             className="rounded-xl bg-emerald-700 p-3 hover:bg-emerald-800 transition"
             title="Tema"
           >
@@ -69,6 +77,7 @@ export default function Cabecalho({
                 src={usuario.photoURL}
                 className="h-full w-full object-cover"
                 referrerPolicy="no-referrer"
+                alt="Usuário"
               />
             ) : (
               <User size={18} />
@@ -80,22 +89,4 @@ export default function Cabecalho({
           <button
             onClick={aoLogout}
             className="rounded-xl bg-emerald-700 p-3 hover:bg-emerald-800 transition"
-            title="Sair"
-          >
-            <LogOut size={20} />
-          </button>
-
-          {/* LIMPAR */}
-          <button
-            onClick={aoLimpar}
-            className="rounded-xl bg-emerald-700 p-3 hover:bg-emerald-800 transition"
-            title="Limpar lista"
-          >
-            <Trash2 size={20} />
-          </button>
-
-        </div>
-      </div>
-    </header>
-  );
-}
+            title="Sair
