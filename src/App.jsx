@@ -32,7 +32,7 @@ function App() {
   const [aba, setAba] = useState("compras");
 
   // ==============================
-  // TEMA LOCAL
+  // TEMA
   // ==============================
   const [tema, setTema] = useState("claro");
 
@@ -48,19 +48,16 @@ function App() {
   }, [lista]);
 
   // ==============================
-  // APLICA TEMA NO DOM
+  // APLICA TEMA NO DOM (CORRETO PARA TAILWIND)
   // ==============================
   useEffect(() => {
-    document.body.classList.remove(
-      "tema-claro",
-      "tema-escuro",
-    );
+    const root = document.documentElement;
 
-    document.body.classList.add(
-      tema === "escuro"
-        ? "tema-escuro"
-        : "tema-claro",
-    );
+    if (tema === "escuro") {
+      root.classList.add("dark");
+    } else {
+      root.classList.remove("dark");
+    }
   }, [tema]);
 
   // ==============================
@@ -71,7 +68,7 @@ function App() {
   };
 
   // ==============================
-  // LOADING AUTH
+  // LOADING
   // ==============================
   if (loading) {
     return (
@@ -81,16 +78,10 @@ function App() {
     );
   }
 
-  // ==============================
-  // USUÁRIO NÃO LOGADO
-  // ==============================
   if (!usuario) {
     return <Login />;
   }
 
-  // ==============================
-  // LOADING LISTA
-  // ==============================
   if (!lista || !setLista) {
     return (
       <div className="flex min-h-screen items-center justify-center">
@@ -99,9 +90,6 @@ function App() {
     );
   }
 
-  // ==============================
-  // ITENS DA LISTA
-  // ==============================
   const itens = lista.itens || [];
 
   // ==============================
@@ -110,9 +98,6 @@ function App() {
   const finalizarCompra = async () => {
     if (!itens.length) return;
 
-    // ==============================
-    // TOTAL DA COMPRA
-    // ==============================
     const total = itens.reduce(
       (acc, item) =>
         acc +
@@ -121,14 +106,8 @@ function App() {
       0,
     );
 
-    // ==============================
-    // ID ÚNICO SEGURO
-    // ==============================
     const id = crypto.randomUUID();
 
-    // ==============================
-    // OBJETO COMPRA
-    // ==============================
     const compra = {
       id,
       estabelecimento: lista.estabelecimento,
@@ -137,42 +116,16 @@ function App() {
       data: new Date().toISOString(),
     };
 
-    // ==============================
-    // IMPORT FIRESTORE
-    // ==============================
-    const { doc, setDoc } = await import(
-      "firebase/firestore"
-    );
+    const { doc, setDoc } = await import("firebase/firestore");
+    const { db } = await import("./services/firebase");
 
-    const { db } = await import(
-      "./services/firebase"
-    );
-
-    // ==============================
-    // SALVAR HISTÓRICO
-    // ==============================
     await setDoc(
-      doc(
-        db,
-        "users",
-        usuario.uid,
-        "compras",
-        id,
-      ),
+      doc(db, "users", usuario.uid, "compras", id),
       compra,
     );
 
-    // ==============================
-    // RESETAR LISTA
-    // ==============================
     await setDoc(
-      doc(
-        db,
-        "users",
-        usuario.uid,
-        "lista",
-        "dados",
-      ),
+      doc(db, "users", usuario.uid, "lista", "dados"),
       {
         modo: "planejamento",
         estabelecimento: "",
@@ -181,9 +134,6 @@ function App() {
       },
     );
 
-    // ==============================
-    // ATUALIZA ESTADO LOCAL
-    // ==============================
     setLista({
       modo: "planejamento",
       estabelecimento: "",
@@ -191,9 +141,6 @@ function App() {
       itens: [],
     });
 
-    // ==============================
-    // IR PARA HISTÓRICO
-    // ==============================
     setAba("historico");
   };
 
@@ -201,12 +148,10 @@ function App() {
   // RENDER
   // ==============================
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-slate-900">
       <Cabecalho
         usuario={usuario}
-        estabelecimento={
-          lista.estabelecimento || ""
-        }
+        estabelecimento={lista.estabelecimento || ""}
         aoDefinirEstabelecimento={(valor) =>
           setLista((prev) => ({
             ...prev,
@@ -233,15 +178,13 @@ function App() {
 
       <main className="mx-auto max-w-4xl space-y-6 px-4 py-6">
 
-        {/* ABAS */}
         <div className="flex gap-2">
-
           <button
             onClick={() => setAba("compras")}
             className={`flex-1 rounded-lg p-3 font-semibold ${
               aba === "compras"
                 ? "bg-emerald-600 text-white"
-                : "bg-white text-gray-700"
+                : "bg-white dark:bg-slate-800 text-gray-700 dark:text-white"
             }`}
           >
             Compras
@@ -252,23 +195,19 @@ function App() {
             className={`flex-1 rounded-lg p-3 font-semibold ${
               aba === "historico"
                 ? "bg-emerald-600 text-white"
-                : "bg-white text-gray-700"
+                : "bg-white dark:bg-slate-800 text-gray-700 dark:text-white"
             }`}
           >
             Histórico
           </button>
         </div>
 
-        {/* ABA COMPRAS */}
         {aba === "compras" && (
           <>
             <AlternarModo
               modo={lista.modo}
               aoAlternar={(modo) =>
-                setLista((prev) => ({
-                  ...prev,
-                  modo,
-                }))
+                setLista((prev) => ({ ...prev, modo }))
               }
             />
 
@@ -278,15 +217,10 @@ function App() {
                   ...prev,
                   itens: [
                     ...prev.itens,
-
-                    // ==============================
-                    // ITEM COM UUID
-                    // ==============================
                     {
                       id: crypto.randomUUID(),
                       nome: dados.nome,
-                      quantidade:
-                        dados.quantidade,
+                      quantidade: dados.quantidade,
                       precoUnitario: 0,
                       comprado: false,
                     },
@@ -306,20 +240,15 @@ function App() {
                       (item.precoUnitario || 0),
                   0,
                 ),
-
-                quantidadeItens:
-                  itens.length,
-
-                itensComprados:
-                  itens.filter(
-                    (item) => item.comprado,
-                  ).length,
+                quantidadeItens: itens.length,
+                itensComprados: itens.filter(
+                  (item) => item.comprado,
+                ).length,
               }}
             />
           </>
         )}
 
-        {/* ABA HISTÓRICO */}
         {aba === "historico" && (
           <Historico
             historico={historico}
