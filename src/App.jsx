@@ -1,6 +1,7 @@
 // ==============================
-// IMPORTAÇÕES
+// APP PRINCIPAL
 // ==============================
+
 import { useState, useEffect } from "react";
 
 import { useAuth } from "./hooks/useAuth";
@@ -9,7 +10,6 @@ import { useHistoricoCompras } from "./hooks/useHistoricoCompras";
 
 import { signOut } from "firebase/auth";
 import { auth, db } from "./services/firebase";
-
 import { doc, setDoc } from "firebase/firestore";
 
 import Cabecalho from "./components/Cabecalho";
@@ -25,9 +25,9 @@ import Historico from "./components/Historico";
 function App() {
   const { usuario, loading } = useAuth();
 
-  const { lista, setLista } = useListaFirestore(usuario || null);
+  const { lista, setLista } = useListaFirestore(usuario);
   const { historico, carregando, deletarCompra } =
-    useHistoricoCompras(usuario || null);
+    useHistoricoCompras(usuario);
 
   const [aba, setAba] = useState("compras");
   const [tema, setTema] = useState("claro");
@@ -35,37 +35,11 @@ function App() {
   const itens = lista?.itens || [];
 
   // ==============================
-  // PROTEÇÃO DE RENDER (SEM QUEBRAR HOOKS)
-  // ==============================
-  if (loading) {
-    return (
-      <div className="flex min-h-screen items-center justify-center">
-        <p>Carregando...</p>
-      </div>
-    );
-  }
-
-  if (!usuario) {
-    return (
-      <div className="flex min-h-screen items-center justify-center">
-        <p>Usuário não autenticado</p>
-      </div>
-    );
-  }
-
-  if (!lista) {
-    return (
-      <div className="flex min-h-screen items-center justify-center">
-        <p>Carregando lista...</p>
-      </div>
-    );
-  }
-
-  // ==============================
   // TEMA
   // ==============================
   useEffect(() => {
-    if (lista?.tema) setTema(lista.tema);
+    if (!lista?.tema) return;
+    setTema(lista.tema);
   }, [lista?.tema]);
 
   useEffect(() => {
@@ -86,9 +60,11 @@ function App() {
   // FINALIZAR COMPRA
   // ==============================
   const finalizarCompra = async () => {
-    if (!itens.length) return;
+    if (!usuario?.uid || !lista?.itens?.length) return;
 
-    const total = itens.reduce(
+    const itensValidos = lista.itens || [];
+
+    const total = itensValidos.reduce(
       (acc, item) =>
         acc +
         (item.quantidade || 0) *
@@ -97,41 +73,108 @@ function App() {
     );
 
     const id =
-      (crypto?.randomUUID && crypto.randomUUID()) ||
+      (typeof crypto !== "undefined" &&
+        crypto.randomUUID &&
+        crypto.randomUUID()) ||
       Math.random().toString(36).substring(2);
 
     const compra = {
       id,
-      estabelecimento: lista.estabelecimento || "",
-      itens,
+      estabelecimento: lista?.estabelecimento || "",
+      itens: itensValidos,
       total,
       data: new Date().toISOString(),
     };
 
-    await setDoc(
-      doc(db, "users", usuario.uid, "compras", id),
-      compra
-    );
+    try {
+      await setDoc(
+        doc(db, "users", usuario.uid, "compras", id),
+        compra
+      );
 
-    await setDoc(
-      doc(db, "users", usuario.uid, "lista", "dados"),
-      {
+      await setDoc(
+        doc(db, "users", usuario.uid, "lista", "dados"),
+        {
+          modo: "planejamento",
+          estabelecimento: "",
+          tema,
+          itens: [],
+        }
+      );
+
+      setLista({
         modo: "planejamento",
         estabelecimento: "",
         tema,
         itens: [],
-      }
-    );
+      });
 
-    setLista({
-      modo: "planejamento",
-      estabelecimento: "",
-      tema,
-      itens: [],
-    });
-
-    setAba("historico");
+      setAba("historico");
+    } catch (err) {
+      console.error("Erro finalizar compra:", err);
+    }
   };
+
+  // ==============================
+  // FUNÇÕES LISTA SEGURAS
+  // ==============================
+  const removerItem = (id) => {
+    setLista((prev) => {
+      if (!prev) return prev;
+
+      return {
+        ...prev,
+        itens: (prev.itens || []).filter((i) => i.id !== id),
+      };
+    });
+  };
+
+  const atualizarItem = (id, dados) => {
+    setLista((prev) => {
+      if (!prev) return prev;
+
+      return {
+        ...prev,
+        itens: (prev.itens || []).map((i) =>
+          i.id === id ? { ...i, ...dados } : i
+        ),
+      };
+    });
+  };
+
+  const alternarComprado = (id) => {
+    setLista((prev) => {
+      if (!prev) return prev;
+
+      return {
+        ...prev,
+        itens: (prev.itens || []).map((i) =>
+          i.id === id
+            ? { ...i, comprado: !i.comprado }
+            : i
+        ),
+      };
+    });
+  };
+
+  // ==============================
+  // LOADING
+  // ==============================
+  if (loading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <p>Carregando...</p>
+      </div>
+    );
+  }
+
+  if (!usuario || !lista) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <p>Carregando lista...</p>
+      </div>
+    );
+  }
 
   // ==============================
   // RENDER
@@ -143,20 +186,25 @@ function App() {
         usuario={usuario}
         estabelecimento={lista.estabelecimento || ""}
         aoDefinirEstabelecimento={(valor) =>
-          setLista((prev) => ({
-            ...prev,
-            estabelecimento: valor,
-          }))
+          setLista((prev) =>
+            prev
+              ? { ...prev, estabelecimento: valor }
+              : prev
+          )
         }
         aoLimpar={() =>
-          setLista((prev) => ({
-            ...prev,
-            itens: [],
-          }))
+          setLista((prev) =>
+            prev ? { ...prev, itens: [] } : prev
+          )
         }
         aoLogout={fazerLogout}
         tema={tema}
-        aoDefinirTema={setTema}
+        aoDefinirTema={(valor) => {
+          setTema(valor);
+          setLista((prev) =>
+            prev ? { ...prev, tema: valor } : prev
+          );
+        }}
       />
 
       <main className="mx-auto max-w-4xl space-y-6 px-4 py-6">
@@ -165,74 +213,71 @@ function App() {
         <div className="flex gap-2">
           <button
             onClick={() => setAba("compras")}
-            className="flex-1 rounded-lg p-3 font-semibold bg-emerald-600 text-white"
+            className={`flex-1 rounded-lg p-3 font-semibold ${
+              aba === "compras"
+                ? "bg-emerald-600 text-white"
+                : "bg-white text-gray-700 dark:bg-slate-800 dark:text-white"
+            }`}
           >
             Compras
           </button>
 
           <button
             onClick={() => setAba("historico")}
-            className="flex-1 rounded-lg p-3 font-semibold bg-white text-gray-700 dark:bg-slate-800 dark:text-white"
+            className={`flex-1 rounded-lg p-3 font-semibold ${
+              aba === "historico"
+                ? "bg-emerald-600 text-white"
+                : "bg-white text-gray-700 dark:bg-slate-800 dark:text-white"
+            }`}
           >
             Histórico
           </button>
         </div>
 
+        {/* COMPRAS */}
         {aba === "compras" && (
           <>
             <AlternarModo
               modo={lista.modo}
               aoAlternar={(modo) =>
-                setLista((prev) => ({ ...prev, modo }))
+                setLista((prev) =>
+                  prev ? { ...prev, modo } : prev
+                )
               }
             />
 
             <FormAdicionar
               aoAdicionar={(dados) =>
-                setLista((prev) => ({
-                  ...prev,
-                  itens: [
-                    ...prev.itens,
-                    {
-                      id: crypto?.randomUUID?.() ||
-                        Math.random().toString(36).substring(2),
-                      nome: dados.nome,
-                      quantidade: dados.quantidade,
-                      precoUnitario: 0,
-                      comprado: false,
-                    },
-                  ],
-                }))
+                setLista((prev) =>
+                  prev
+                    ? {
+                        ...prev,
+                        itens: [
+                          ...prev.itens,
+                          {
+                            id:
+                              (typeof crypto !== "undefined" &&
+                                crypto.randomUUID &&
+                                crypto.randomUUID()) ||
+                              Math.random().toString(36).substring(2),
+                            nome: dados.nome,
+                            quantidade: dados.quantidade,
+                            precoUnitario: 0,
+                            comprado: false,
+                          },
+                        ],
+                      }
+                    : prev
+                )
               }
             />
 
             <ListaItens
               itens={itens}
               modo={lista.modo}
-              aoRemover={(id) =>
-                setLista((prev) => ({
-                  ...prev,
-                  itens: prev.itens.filter((i) => i.id !== id),
-                }))
-              }
-              aoAtualizar={(id, dados) =>
-                setLista((prev) => ({
-                  ...prev,
-                  itens: prev.itens.map((i) =>
-                    i.id === id ? { ...i, ...dados } : i
-                  ),
-                }))
-              }
-              aoAlternarComprado={(id) =>
-                setLista((prev) => ({
-                  ...prev,
-                  itens: prev.itens.map((i) =>
-                    i.id === id
-                      ? { ...i, comprado: !i.comprado }
-                      : i
-                  ),
-                }))
-              }
+              aoRemover={removerItem}
+              aoAtualizar={atualizarItem}
+              aoAlternarComprado={alternarComprado}
             />
 
             <ResumoTotal
@@ -246,7 +291,7 @@ function App() {
                 ),
                 quantidadeItens: itens.length,
                 itensComprados: itens.filter(
-                  (i) => i.comprado
+                  (item) => item.comprado
                 ).length,
               }}
             />
@@ -262,6 +307,7 @@ function App() {
           </>
         )}
 
+        {/* HISTÓRICO */}
         {aba === "historico" && (
           <Historico
             historico={historico}
