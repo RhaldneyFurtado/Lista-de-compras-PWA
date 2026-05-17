@@ -3,23 +3,21 @@
 // ==============================
 
 import { useState, useEffect } from "react";
-
-import { signInWithPopup, signOut, onAuthStateChanged } from "firebase/auth";
-
+import {
+  signInWithPopup,
+  signOut,
+  onAuthStateChanged,
+} from "firebase/auth";
 import { doc, setDoc } from "firebase/firestore";
-
 import { auth, db, googleProvider } from "../services/firebase";
 
+// ==============================
+// HOOK AUTH
+// ==============================
 export function useAuth() {
-  // ==============================
-  // ESTADOS
-  // ==============================
   const [usuario, setUsuario] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // ==============================
-  // SALVAR USUÁRIO
-  // ==============================
   const salvarUsuarioFirestore = async (user) => {
     if (!user) return;
 
@@ -32,33 +30,45 @@ export function useAuth() {
           foto: user.photoURL || "",
           ultimoLogin: new Date().toISOString(),
         },
-        { merge: true },
+        { merge: true }
       );
     } catch (error) {
       console.error("Erro ao salvar usuário:", error);
     }
   };
 
-  // ==============================
-  // LISTENER AUTH (FONTE ÚNICA)
-  // ==============================
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+    let ativo = true;
+
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (!ativo) return;
+
       setUsuario(user || null);
 
-      if (user) {
-        await salvarUsuarioFirestore(user);
-      }
+      const processar = async () => {
+        if (!user) {
+          setLoading(false);
+          return;
+        }
 
-      setLoading(false);
+        try {
+          await salvarUsuarioFirestore(user);
+        } catch (e) {
+          console.error(e);
+        }
+
+        if (ativo) setLoading(false);
+      };
+
+      processar();
     });
 
-    return () => unsubscribe();
+    return () => {
+      ativo = false;
+      unsubscribe();
+    };
   }, []);
 
-  // ==============================
-  // LOGIN GOOGLE
-  // ==============================
   const entrarComGoogle = async () => {
     try {
       await signInWithPopup(auth, googleProvider);
@@ -67,9 +77,6 @@ export function useAuth() {
     }
   };
 
-  // ==============================
-  // LOGOUT
-  // ==============================
   const sair = async () => {
     try {
       await signOut(auth);
