@@ -10,6 +10,9 @@ import { useHistoricoCompras } from "./hooks/useHistoricoCompras";
 import { signOut } from "firebase/auth";
 import { auth } from "./services/firebase";
 
+import { doc, setDoc } from "firebase/firestore";
+import { db } from "./services/firebase";
+
 import Cabecalho from "./components/Cabecalho";
 import AlternarModo from "./components/AlternarModo";
 import FormAdicionar from "./components/FormAdicionar";
@@ -71,7 +74,9 @@ function App() {
       0
     );
 
-    const id = crypto.randomUUID();
+    const id =
+      crypto?.randomUUID?.() ??
+      Math.random().toString(36).substring(2);
 
     const compra = {
       id,
@@ -80,9 +85,6 @@ function App() {
       total,
       data: new Date().toISOString(),
     };
-
-    const { doc, setDoc } = await import("firebase/firestore");
-    const { db } = await import("./services/firebase");
 
     await setDoc(
       doc(db, "users", usuario.uid, "compras", id),
@@ -140,7 +142,7 @@ function App() {
   };
 
   // ==============================
-  // LOADING AUTH
+  // LOADING
   // ==============================
   if (loading) {
     return (
@@ -150,8 +152,57 @@ function App() {
     );
   }
 
-  // ==============================
-  // USUÁRIO NÃO LOGADO
-  // ==============================
   if (!usuario) {
     return <Login />;
+  }
+
+  if (!lista) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <p>Carregando lista...</p>
+      </div>
+    );
+  }
+
+  // ==============================
+  // RENDER
+  // ==============================
+  return (
+    <div className="min-h-screen bg-gray-50 dark:bg-slate-900">
+
+      <Cabecalho
+        usuario={usuario}
+        estabelecimento={lista.estabelecimento || ""}
+        aoDefinirEstabelecimento={(valor) =>
+          setLista((prev) => ({
+            ...prev,
+            estabelecimento: valor,
+          }))
+        }
+        aoLimpar={() =>
+          setLista((prev) => ({
+            ...prev,
+            itens: [],
+          }))
+        }
+        aoLogout={fazerLogout}
+        tema={tema}
+        aoDefinirTema={(valor) => {
+          setTema(valor);
+
+          setLista((prev) => ({
+            ...prev,
+            tema: valor,
+          }));
+        }}
+      />
+
+      <main className="mx-auto max-w-4xl space-y-6 px-4 py-6">
+
+        {/* ABAS */}
+        <div className="flex gap-2">
+          <button
+            onClick={() => setAba("compras")}
+            className={`flex-1 rounded-lg p-3 font-semibold ${
+              aba === "compras"
+                ? "bg-emerald-600
