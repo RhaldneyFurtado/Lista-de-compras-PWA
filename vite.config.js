@@ -10,7 +10,7 @@ import { VitePWA } from "vite-plugin-pwa";
 // ==============================
 export default defineConfig({
   // ==============================
-  // BASE DO GITHUB PAGES
+  // BASE GITHUB PAGES
   // ==============================
   base: "/Lista-de-compras-PWA/",
 
@@ -22,45 +22,25 @@ export default defineConfig({
 
     VitePWA({
       // ==============================
-      // ATUALIZAÇÃO DO PWA
+      // AUTO UPDATE PWA
       // ==============================
       registerType: "autoUpdate",
 
       // ==============================
-      // WORKBOX (CACHE CONTROLADO)
+      // WORKBOX
       // ==============================
       workbox: {
-        // ==============================
-        // ARQUIVOS CACHEADOS
-        // ==============================
         globPatterns: [
           "**/*.{js,css,html,ico,png,svg}",
         ],
 
-        // ==============================
-        // LIMPA CACHE ANTIGO
-        // ==============================
         cleanupOutdatedCaches: true,
-
-        // ==============================
-        // NOVO SERVICE WORKER
-        // ASSUME CONTROLE IMEDIATAMENTE
-        // ==============================
-        clientsClaim: true,
-
-        // ==============================
-        // EVITA WAITING STATE
-        // ==============================
-        skipWaiting: true,
       },
 
       // ==============================
-      // MANIFESTO DO PWA
+      // MANIFESTO
       // ==============================
       manifest: {
-        // ==============================
-        // INFORMAÇÕES DO APP
-        // ==============================
         name: "Lista de Compras Inteligente",
 
         short_name: "Compras",
@@ -68,33 +48,18 @@ export default defineConfig({
         description:
           "Organize suas compras de forma simples e rápida",
 
-        // ==============================
-        // CORES
-        // ==============================
         theme_color: "#10b981",
 
         background_color: "#ffffff",
 
-        // ==============================
-        // MODO DE EXIBIÇÃO
-        // ==============================
         display: "standalone",
 
-        // ==============================
-        // URL INICIAL
-        // ==============================
         start_url:
           "/Lista-de-compras-PWA/",
 
-        // ==============================
-        // ESCOPO DO APP
-        // ==============================
         scope:
           "/Lista-de-compras-PWA/",
 
-        // ==============================
-        // ÍCONES
-        // ==============================
         icons: [
           {
             src:
@@ -128,7 +93,7 @@ export default defineConfig({
       },
 
       // ==============================
-      // DEV (TESTE LOCAL)
+      // DEV
       // ==============================
       devOptions: {
         enabled: true,
@@ -137,7 +102,7 @@ export default defineConfig({
   ],
 
   // ==============================
-  // SERVIDOR LOCAL
+  // SERVER
   // ==============================
   server: {
     host: true,
@@ -146,17 +111,10 @@ export default defineConfig({
   },
 
   // ==============================
-  // BUILD FINAL
+  // BUILD
   // ==============================
   build: {
-    // ==============================
-    // DESATIVA SOURCE MAP
-    // ==============================
     sourcemap: false,
-
-    // ==============================
-    // PASTA FINAL DO BUILD
-    // ==============================
     outDir: "dist",
   },
 });
