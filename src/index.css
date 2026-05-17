@@ -17,23 +17,9 @@
 
 /* ==============================
    BASE DO APP
-   (TAILWIND CONTROLA TEMA E CORES)
 ============================== */
 body {
   transition: background 0.3s ease, color 0.3s ease;
-}
-
-/* ==============================
-   FUNDO GLOBAL (EVITA ÁREAS BRANCAS)
-============================== */
-@layer base {
-  body {
-    @apply bg-gray-50 text-gray-900;
-  }
-
-  .dark body {
-    @apply bg-slate-900 text-white;
-  }
 }
 
 /* ==============================
@@ -46,20 +32,37 @@ body {
 }
 
 /* ==============================
-   CABEÇALHO
-   (ESTILO CONTROLADO PELO TAILWIND)
+   CABEÇALHO BASE
 ============================== */
 header {
   width: 100%;
+  padding: 20px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
 }
 
 /* ==============================
-   CARD
+   CARD (TAILWIND CONTROLADO)
 ============================== */
-.card {
-  border-radius: 16px;
-  padding: 16px;
-  margin-top: 16px;
+@layer components {
+  .card {
+    @apply rounded-2xl p-4 mt-4 shadow-md bg-white dark:bg-slate-800 text-gray-900 dark:text-white;
+  }
+
+  .item {
+    @apply flex justify-between items-center p-3 rounded-xl bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700;
+  }
+
+  .btn {
+    @apply px-4 py-2 rounded-xl transition;
+  }
+
+  .btn-primary {
+    @apply bg-emerald-600 text-white hover:bg-emerald-700;
+  }
+
+  .btn-danger {
+    @apply bg-red-500 text-white hover:bg-red-600;
+  }
 }
 
 /* ==============================
@@ -72,54 +75,13 @@ input {
   border: 1px solid #e5e7eb;
   outline: none;
   transition: 0.2s;
-  background: transparent;
-  color: inherit;
+  background: white;
 }
 
-input:focus {
-  border-color: #10b981;
-  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
-}
-
-/* ==============================
-   BOTÕES
-============================== */
-button {
-  border: none;
-  cursor: pointer;
-  transition: 0.2s ease;
-}
-
-/* ==============================
-   LISTA
-============================== */
-.list {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  margin-top: 15px;
-}
-
-.item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 12px;
-  border-radius: 12px;
-  border: 1px solid #e5e7eb;
-}
-
-/* ==============================
-   AVATAR
-============================== */
-.avatar {
-  width: 42px;
-  height: 42px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
+.dark input {
+  background: #0f172a;
+  color: white;
+  border-color: #334155;
 }
 
 /* ==============================
