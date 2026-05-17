@@ -24,13 +24,14 @@ import Historico from "./components/Historico";
 function App() {
   const { usuario, loading } = useAuth();
 
-  const { lista, setLista } = useListaFirestore(usuario || null);
-
+  const { lista, setLista } = useListaFirestore(usuario);
   const { historico, carregando, deletarCompra } =
-    useHistoricoCompras(usuario || null);
+    useHistoricoCompras(usuario);
 
   const [aba, setAba] = useState("compras");
   const [tema, setTema] = useState("claro");
+
+  const itens = lista?.itens || [];
 
   // ==============================
   // SINCRONIZA TEMA DA LISTA
@@ -44,8 +45,10 @@ function App() {
   // APLICA TEMA NO DOM
   // ==============================
   useEffect(() => {
-    const root = document.documentElement;
-    root.classList.toggle("dark", tema === "escuro");
+    document.documentElement.classList.toggle(
+      "dark",
+      tema === "escuro"
+    );
   }, [tema]);
 
   // ==============================
@@ -53,6 +56,87 @@ function App() {
   // ==============================
   const fazerLogout = async () => {
     await signOut(auth);
+  };
+
+  // ==============================
+  // FINALIZAR COMPRA
+  // ==============================
+  const finalizarCompra = async () => {
+    if (!itens.length) return;
+
+    const total = itens.reduce(
+      (acc, item) =>
+        acc +
+        (item.quantidade || 0) * (item.precoUnitario || 0),
+      0
+    );
+
+    const id = crypto.randomUUID();
+
+    const compra = {
+      id,
+      estabelecimento: lista.estabelecimento,
+      itens,
+      total,
+      data: new Date().toISOString(),
+    };
+
+    const { doc, setDoc } = await import("firebase/firestore");
+    const { db } = await import("./services/firebase");
+
+    await setDoc(
+      doc(db, "users", usuario.uid, "compras", id),
+      compra
+    );
+
+    await setDoc(
+      doc(db, "users", usuario.uid, "lista", "dados"),
+      {
+        modo: "planejamento",
+        estabelecimento: "",
+        tema,
+        itens: [],
+      }
+    );
+
+    setLista({
+      modo: "planejamento",
+      estabelecimento: "",
+      tema,
+      itens: [],
+    });
+
+    setAba("historico");
+  };
+
+  // ==============================
+  // FUNÇÕES LISTA
+  // ==============================
+  const removerItem = (id) => {
+    setLista((prev) => ({
+      ...prev,
+      itens: prev.itens.filter((i) => i.id !== id),
+    }));
+  };
+
+  const atualizarItem = (id, dados) => {
+    setLista((prev) => ({
+      ...prev,
+      itens: prev.itens.map((i) =>
+        i.id === id ? { ...i, ...dados } : i
+      ),
+    }));
+  };
+
+  const alternarComprado = (id) => {
+    setLista((prev) => ({
+      ...prev,
+      itens: prev.itens.map((i) =>
+        i.id === id
+          ? { ...i, comprado: !i.comprado }
+          : i
+      ),
+    }));
   };
 
   // ==============================
@@ -67,208 +151,7 @@ function App() {
   }
 
   // ==============================
-  // LOGIN
+  // USUÁRIO NÃO LOGADO
   // ==============================
   if (!usuario) {
     return <Login />;
-  }
-
-  // ==============================
-  // LISTA SEGURA
-  // ==============================
-  if (!lista || !setLista) {
-    return (
-      <div className="flex min-h-screen items-center justify-center">
-        <p>Carregando lista...</p>
-      </div>
-    );
-  }
-
-  const itens = Array.isArray(lista.itens) ? lista.itens : [];
-
-  // ==============================
-  // FUNÇÕES LISTA
-  // ==============================
-  const removerItem = (id) => {
-    setLista((prev) => ({
-      ...prev,
-      itens: (prev.itens || []).filter((i) => i.id !== id),
-    }));
-  };
-
-  const atualizarItem = (id, dados) => {
-    setLista((prev) => ({
-      ...prev,
-      itens: (prev.itens || []).map((i) =>
-        i.id === id ? { ...i, ...dados } : i
-      ),
-    }));
-  };
-
-  const alternarComprado = (id) => {
-    setLista((prev) => ({
-      ...prev,
-      itens: (prev.itens || []).map((i) =>
-        i.id === id ? { ...i, comprado: !i.comprado } : i
-      ),
-    }));
-  };
-
-  // ==============================
-  // FINALIZAR COMPRA
-  // ==============================
-  const finalizarCompra = async () => {
-    if (!itens.length) return;
-
-    const total = itens.reduce(
-      (acc, item) =>
-        acc + (item.quantidade || 0) * (item.precoUnitario || 0),
-      0
-    );
-
-    const id = crypto.randomUUID();
-
-    const compra = {
-      id,
-      estabelecimento: lista.estabelecimento || "",
-      itens,
-      total,
-      data: new Date().toISOString(),
-    };
-
-    const { doc, setDoc } = await import("firebase/firestore");
-    const { db } = await import("./services/firebase");
-
-    await setDoc(doc(db, "users", usuario.uid, "compras", id), compra);
-
-    await setDoc(doc(db, "users", usuario.uid, "lista", "dados"), {
-      modo: "planejamento",
-      estabelecimento: "",
-      tema,
-      itens: [],
-    });
-
-    setLista({
-      modo: "planejamento",
-      estabelecimento: "",
-      tema,
-      itens: [],
-    });
-
-    setAba("historico");
-  };
-
-  // ==============================
-  // RENDER
-  // ==============================
-  return (
-    <div className="min-h-screen bg-gray-50 dark:bg-slate-900">
-      <Cabecalho
-        usuario={usuario}
-        estabelecimento={lista.estabelecimento || ""}
-        aoDefinirEstabelecimento={(valor) =>
-          setLista((prev) => ({ ...prev, estabelecimento: valor }))
-        }
-        aoLimpar={() =>
-          setLista((prev) => ({ ...prev, itens: [] }))
-        }
-        aoLogout={fazerLogout}
-        tema={tema}
-        aoDefinirTema={(valor) => {
-          setTema(valor);
-          setLista((prev) => ({ ...prev, tema: valor }));
-        }}
-      />
-
-      <main className="mx-auto max-w-4xl space-y-6 px-4 py-6">
-        {/* ABAS */}
-        <div className="flex gap-2">
-          <button
-            onClick={() => setAba("compras")}
-            className={`flex-1 rounded-lg p-3 font-semibold ${
-              aba === "compras"
-                ? "bg-emerald-600 text-white"
-                : "bg-white text-gray-700 dark:bg-slate-800 dark:text-white"
-            }`}
-          >
-            Compras
-          </button>
-
-          <button
-            onClick={() => setAba("historico")}
-            className={`flex-1 rounded-lg p-3 font-semibold ${
-              aba === "historico"
-                ? "bg-emerald-600 text-white"
-                : "bg-white text-gray-700 dark:bg-slate-800 dark:text-white"
-            }`}
-          >
-            Histórico
-          </button>
-        </div>
-
-        {/* COMPRAS */}
-        {aba === "compras" && (
-          <>
-            <AlternarModo
-              modo={lista.modo}
-              aoAlternar={(modo) =>
-                setLista((prev) => ({ ...prev, modo }))
-              }
-            />
-
-            <FormAdicionar
-              aoAdicionar={(dados) =>
-                setLista((prev) => ({
-                  ...prev,
-                  itens: [
-                    ...(prev.itens || []),
-                    {
-                      id: crypto.randomUUID(),
-                      nome: dados.nome || "",
-                      quantidade: Number(dados.quantidade || 1),
-                      precoUnitario: 0,
-                      comprado: false,
-                    },
-                  ],
-                }))
-              }
-            />
-
-            <ListaItens
-              itens={itens}
-              modo={lista.modo}
-              aoRemover={removerItem}
-              aoAtualizar={atualizarItem}
-              aoAlternarComprado={alternarComprado}
-            />
-
-            <ResumoTotal
-              totais={{
-                total: itens.reduce(
-                  (acc, item) =>
-                    acc +
-                    (item.quantidade || 0) *
-                      (item.precoUnitario || 0),
-                  0
-                ),
-                quantidadeItens: itens.length,
-                itensComprados: itens.filter((i) => i.comprado).length,
-              }}
-            />
-          </>
-        )}
-
-        {/* HISTÓRICO */}
-        {aba === "historico" && (
-          <Historico
-            historico={historico}
-            carregando={carregando}
-            deletarCompra={deletarCompra}
-          />
-        )}
-      </main>
-    </div>
-  );
-}
-
-export default App;
