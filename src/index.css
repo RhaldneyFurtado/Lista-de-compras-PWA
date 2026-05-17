@@ -1,4 +1,11 @@
 /* ==============================
+   TAILWIND BASE
+============================== */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ==============================
    RESET GLOBAL
 ============================== */
 * {
@@ -31,24 +38,19 @@ body {
 ============================== */
 header {
   width: 100%;
-  padding: 20px;
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
 }
 
 /* ==============================
    CARD
-   (CORES E BORDAS VIA TAILWIND)
 ============================== */
 .card {
   border-radius: 16px;
   padding: 16px;
   margin-top: 16px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 }
 
 /* ==============================
    INPUTS
-   (ESTILO BASE - TAILWIND DEFINE CORES)
 ============================== */
 input {
   width: 100%;
@@ -57,9 +59,12 @@ input {
   border: 1px solid #e5e7eb;
   outline: none;
   transition: 0.2s;
+  background: transparent;
+  color: inherit;
 }
 
 input:focus {
+  border-color: #10b981;
   box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
 }
 
@@ -70,24 +75,6 @@ button {
   border: none;
   cursor: pointer;
   transition: 0.2s ease;
-}
-
-/* botão principal (cor via Tailwind no JSX) */
-.btn-primary {
-  padding: 10px 14px;
-  border-radius: 12px;
-}
-
-/* botão perigo */
-.btn-danger {
-  padding: 10px 14px;
-  border-radius: 12px;
-}
-
-/* botão neutro */
-.btn {
-  padding: 10px 14px;
-  border-radius: 12px;
 }
 
 /* ==============================
