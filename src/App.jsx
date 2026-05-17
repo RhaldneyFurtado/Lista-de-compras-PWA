@@ -48,15 +48,21 @@ function App() {
   }, [lista]);
 
   // ==============================
-  // APLICA TEMA NO DOM (CORRETO PARA TAILWIND)
+  // APLICA TEMA NO DOM (ESTÁVEL)
   // ==============================
   useEffect(() => {
     const root = document.documentElement;
 
+    // ==============================
+    // LIMPA ESTADO ANTERIOR
+    // ==============================
+    root.classList.remove("dark");
+
+    // ==============================
+    // APLICA TEMA ESCURO
+    // ==============================
     if (tema === "escuro") {
       root.classList.add("dark");
-    } else {
-      root.classList.remove("dark");
     }
   }, [tema]);
 
@@ -68,7 +74,7 @@ function App() {
   };
 
   // ==============================
-  // LOADING
+  // LOADING AUTH
   // ==============================
   if (loading) {
     return (
@@ -78,10 +84,16 @@ function App() {
     );
   }
 
+  // ==============================
+  // USUÁRIO NÃO LOGADO
+  // ==============================
   if (!usuario) {
     return <Login />;
   }
 
+  // ==============================
+  // LOADING LISTA
+  // ==============================
   if (!lista || !setLista) {
     return (
       <div className="flex min-h-screen items-center justify-center">
@@ -178,6 +190,7 @@ function App() {
 
       <main className="mx-auto max-w-4xl space-y-6 px-4 py-6">
 
+        {/* ABAS */}
         <div className="flex gap-2">
           <button
             onClick={() => setAba("compras")}
@@ -202,6 +215,7 @@ function App() {
           </button>
         </div>
 
+        {/* ABA COMPRAS */}
         {aba === "compras" && (
           <>
             <AlternarModo
@@ -249,6 +263,7 @@ function App() {
           </>
         )}
 
+        {/* ABA HISTÓRICO */}
         {aba === "historico" && (
           <Historico
             historico={historico}
