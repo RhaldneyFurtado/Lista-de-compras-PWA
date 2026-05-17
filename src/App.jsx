@@ -158,6 +158,11 @@ function App() {
     );
   }
 
+  // normalização do modo (CORREÇÃO DO BOTÃO)
+  const modoNormalizado = (lista.modo || "")
+    .trim()
+    .toLowerCase();
+
   // ==============================
   // RENDER
   // ==============================
@@ -273,7 +278,8 @@ function App() {
               }}
             />
 
-            {lista.modo === "feira" && itens.length > 0 && (
+            {/* BOTÃO FINALIZAR COMPRA (CORRIGIDO) */}
+            {modoNormalizado === "feira" && itens.length > 0 && (
               <button
                 onClick={finalizarCompra}
                 className="w-full rounded-lg bg-emerald-600 p-3 text-white font-semibold"
