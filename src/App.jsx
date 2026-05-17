@@ -32,21 +32,34 @@ function App() {
   const [aba, setAba] = useState("compras");
 
   // ==============================
-  // TEMA LOCAL (NÃO DEPENDE DO FIRESTORE DIRETO)
+  // TEMA LOCAL
   // ==============================
   const [tema, setTema] = useState("claro");
 
-  // só sincroniza quando lista existir (SEM travar render)
+  // ==============================
+  // SINCRONIZA TEMA DA LISTA
+  // ==============================
   useEffect(() => {
     if (!lista) return;
-    if (lista.tema) setTema(lista.tema);
+
+    if (lista.tema) {
+      setTema(lista.tema);
+    }
   }, [lista]);
 
-  // aplica tema no DOM
+  // ==============================
+  // APLICA TEMA NO DOM
+  // ==============================
   useEffect(() => {
-    document.body.classList.remove("tema-claro", "tema-escuro");
+    document.body.classList.remove(
+      "tema-claro",
+      "tema-escuro",
+    );
+
     document.body.classList.add(
-      tema === "escuro" ? "tema-escuro" : "tema-claro"
+      tema === "escuro"
+        ? "tema-escuro"
+        : "tema-claro",
     );
   }, [tema]);
 
@@ -57,6 +70,9 @@ function App() {
     await signOut(auth);
   };
 
+  // ==============================
+  // LOADING AUTH
+  // ==============================
   if (loading) {
     return (
       <div className="flex min-h-screen items-center justify-center">
@@ -65,8 +81,16 @@ function App() {
     );
   }
 
-  if (!usuario) return <Login />;
+  // ==============================
+  // USUÁRIO NÃO LOGADO
+  // ==============================
+  if (!usuario) {
+    return <Login />;
+  }
 
+  // ==============================
+  // LOADING LISTA
+  // ==============================
   if (!lista || !setLista) {
     return (
       <div className="flex min-h-screen items-center justify-center">
@@ -75,6 +99,9 @@ function App() {
     );
   }
 
+  // ==============================
+  // ITENS DA LISTA
+  // ==============================
   const itens = lista.itens || [];
 
   // ==============================
@@ -83,13 +110,25 @@ function App() {
   const finalizarCompra = async () => {
     if (!itens.length) return;
 
+    // ==============================
+    // TOTAL DA COMPRA
+    // ==============================
     const total = itens.reduce(
-      (acc, i) => acc + (i.quantidade || 0) * (i.precoUnitario || 0),
-      0
+      (acc, item) =>
+        acc +
+        (item.quantidade || 0) *
+          (item.precoUnitario || 0),
+      0,
     );
 
-    const id = Date.now().toString();
+    // ==============================
+    // ID ÚNICO SEGURO
+    // ==============================
+    const id = crypto.randomUUID();
 
+    // ==============================
+    // OBJETO COMPRA
+    // ==============================
     const compra = {
       id,
       estabelecimento: lista.estabelecimento,
@@ -98,18 +137,53 @@ function App() {
       data: new Date().toISOString(),
     };
 
-    const { doc, setDoc } = await import("firebase/firestore");
-    const { db } = await import("./services/firebase");
+    // ==============================
+    // IMPORT FIRESTORE
+    // ==============================
+    const { doc, setDoc } = await import(
+      "firebase/firestore"
+    );
 
-    await setDoc(doc(db, "users", usuario.uid, "compras", id), compra);
+    const { db } = await import(
+      "./services/firebase"
+    );
 
-    await setDoc(doc(db, "users", usuario.uid, "lista", "dados"), {
-      modo: "planejamento",
-      estabelecimento: "",
-      tema,
-      itens: [],
-    });
+    // ==============================
+    // SALVAR HISTÓRICO
+    // ==============================
+    await setDoc(
+      doc(
+        db,
+        "users",
+        usuario.uid,
+        "compras",
+        id,
+      ),
+      compra,
+    );
 
+    // ==============================
+    // RESETAR LISTA
+    // ==============================
+    await setDoc(
+      doc(
+        db,
+        "users",
+        usuario.uid,
+        "lista",
+        "dados",
+      ),
+      {
+        modo: "planejamento",
+        estabelecimento: "",
+        tema,
+        itens: [],
+      },
+    );
+
+    // ==============================
+    // ATUALIZA ESTADO LOCAL
+    // ==============================
     setLista({
       modo: "planejamento",
       estabelecimento: "",
@@ -117,6 +191,9 @@ function App() {
       itens: [],
     });
 
+    // ==============================
+    // IR PARA HISTÓRICO
+    // ==============================
     setAba("historico");
   };
 
@@ -125,34 +202,43 @@ function App() {
   // ==============================
   return (
     <div className="min-h-screen bg-gray-50">
-
       <Cabecalho
         usuario={usuario}
-        estabelecimento={lista.estabelecimento || ""}
-
-        aoDefinirEstabelecimento={(v) =>
-          setLista((p) => ({ ...p, estabelecimento: v }))
+        estabelecimento={
+          lista.estabelecimento || ""
         }
-
+        aoDefinirEstabelecimento={(valor) =>
+          setLista((prev) => ({
+            ...prev,
+            estabelecimento: valor,
+          }))
+        }
         aoLimpar={() =>
-          setLista((p) => ({ ...p, itens: [] }))
+          setLista((prev) => ({
+            ...prev,
+            itens: [],
+          }))
         }
-
         aoLogout={fazerLogout}
-
         tema={tema}
-        aoDefinirTema={(v) => {
-          setTema(v);
-          setLista((p) => ({ ...p, tema: v }));
+        aoDefinirTema={(valor) => {
+          setTema(valor);
+
+          setLista((prev) => ({
+            ...prev,
+            tema: valor,
+          }));
         }}
       />
 
       <main className="mx-auto max-w-4xl space-y-6 px-4 py-6">
 
+        {/* ABAS */}
         <div className="flex gap-2">
+
           <button
             onClick={() => setAba("compras")}
-            className={`flex-1 p-3 rounded-lg font-semibold ${
+            className={`flex-1 rounded-lg p-3 font-semibold ${
               aba === "compras"
                 ? "bg-emerald-600 text-white"
                 : "bg-white text-gray-700"
@@ -163,7 +249,7 @@ function App() {
 
           <button
             onClick={() => setAba("historico")}
-            className={`flex-1 p-3 rounded-lg font-semibold ${
+            className={`flex-1 rounded-lg p-3 font-semibold ${
               aba === "historico"
                 ? "bg-emerald-600 text-white"
                 : "bg-white text-gray-700"
@@ -173,25 +259,34 @@ function App() {
           </button>
         </div>
 
+        {/* ABA COMPRAS */}
         {aba === "compras" && (
           <>
             <AlternarModo
               modo={lista.modo}
-              aoAlternar={(m) =>
-                setLista((p) => ({ ...p, modo: m }))
+              aoAlternar={(modo) =>
+                setLista((prev) => ({
+                  ...prev,
+                  modo,
+                }))
               }
             />
 
             <FormAdicionar
-              aoAdicionar={(d) =>
-                setLista((p) => ({
-                  ...p,
+              aoAdicionar={(dados) =>
+                setLista((prev) => ({
+                  ...prev,
                   itens: [
-                    ...p.itens,
+                    ...prev.itens,
+
+                    // ==============================
+                    // ITEM COM UUID
+                    // ==============================
                     {
-                      id: Date.now().toString(),
-                      nome: d.nome,
-                      quantidade: d.quantidade,
+                      id: crypto.randomUUID(),
+                      nome: dados.nome,
+                      quantidade:
+                        dados.quantidade,
                       precoUnitario: 0,
                       comprado: false,
                     },
@@ -205,18 +300,26 @@ function App() {
             <ResumoTotal
               totais={{
                 total: itens.reduce(
-                  (acc, i) =>
+                  (acc, item) =>
                     acc +
-                    (i.quantidade || 0) * (i.precoUnitario || 0),
-                  0
+                    (item.quantidade || 0) *
+                      (item.precoUnitario || 0),
+                  0,
                 ),
-                quantidadeItens: itens.length,
-                itensComprados: itens.filter((i) => i.comprado).length,
+
+                quantidadeItens:
+                  itens.length,
+
+                itensComprados:
+                  itens.filter(
+                    (item) => item.comprado,
+                  ).length,
               }}
             />
           </>
         )}
 
+        {/* ABA HISTÓRICO */}
         {aba === "historico" && (
           <Historico
             historico={historico}
