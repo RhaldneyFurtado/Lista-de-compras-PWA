@@ -1,7 +1,12 @@
 // ==============================
 // IMPORTA ÍCONES
 // ==============================
-import { ShoppingCart, Trash2, LogOut, User } from "lucide-react";
+import {
+  ShoppingCart,
+  Trash2,
+  LogOut,
+  User,
+} from "lucide-react";
 
 // ==============================
 // COMPONENTE - CABEÇALHO
@@ -18,44 +23,67 @@ export default function Cabecalho({
   const temaSeguro = tema || "claro";
 
   return (
-    <header className="bg-emerald-600 text-white shadow-lg">
+    <header className="w-full bg-emerald-600 text-white shadow-lg">
 
-      <div className="mx-auto max-w-4xl px-4 py-4">
+      {/* ============================== */}
+      {/* CONTAINER FULL WIDTH */}
+      {/* ============================== */}
+      <div className="w-full px-4 pt-6 pb-6">
 
+        {/* ============================== */}
         {/* TOPO */}
-        <div className="mb-4 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        {/* ============================== */}
+        <div className="mb-5 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
 
+          {/* ============================== */}
           {/* LOGO */}
+          {/* ============================== */}
           <div className="flex items-center gap-3">
-            <div className="rounded-lg bg-white p-2">
-              <ShoppingCart className="text-emerald-600" size={28} />
+
+            <div className="rounded-2xl bg-emerald-700 p-3 shadow-md">
+              <ShoppingCart
+                className="text-white"
+                size={30}
+              />
             </div>
 
             <div>
-              <h1 className="text-2xl font-bold">Lista de Compras</h1>
+              <h1 className="text-3xl font-bold leading-tight">
+                Lista de Compras
+              </h1>
+
               <p className="text-sm text-emerald-100">
                 Organize suas compras
               </p>
             </div>
           </div>
 
+          {/* ============================== */}
           {/* AÇÕES */}
-          <div className="flex items-center gap-3 justify-end sm:ml-auto">
+          {/* ============================== */}
+          <div className="flex items-center justify-end gap-3 sm:ml-auto">
 
-            {/* TEMA (FORÇADO VISUALMENTE SEM DEPENDER DE NADA EXTERNO) */}
+            {/* TEMA */}
             <button
               onClick={() => {
-                const novo = temaSeguro === "escuro" ? "claro" : "escuro";
+                const novo =
+                  temaSeguro === "escuro"
+                    ? "claro"
+                    : "escuro";
+
                 aoDefinirTema?.(novo);
               }}
-              className="rounded-lg bg-emerald-700 p-2 hover:bg-emerald-800"
+              className="rounded-xl bg-emerald-700 p-3 transition hover:bg-emerald-800"
               title="Tema"
             >
-              {temaSeguro === "escuro" ? "☀️" : "🌙"}
+              {temaSeguro === "escuro"
+                ? "☀️"
+                : "🌙"}
             </button>
 
             {/* USUÁRIO */}
-            <div className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-full border-2 border-white bg-emerald-700 shrink-0">
+            <div className="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-full border-2 border-white bg-emerald-700 shadow">
+
               {usuario?.photoURL ? (
                 <img
                   src={usuario.photoURL}
@@ -64,14 +92,14 @@ export default function Cabecalho({
                   referrerPolicy="no-referrer"
                 />
               ) : (
-                <User size={20} />
+                <User size={22} />
               )}
             </div>
 
             {/* LOGOUT */}
             <button
               onClick={aoLogout}
-              className="rounded-lg bg-emerald-700 p-2 hover:bg-emerald-800 shrink-0"
+              className="rounded-xl bg-emerald-700 p-3 transition hover:bg-emerald-800"
               title="Sair"
             >
               <LogOut size={20} />
@@ -80,26 +108,12 @@ export default function Cabecalho({
             {/* LIMPAR */}
             <button
               onClick={aoLimpar}
-              className="rounded-lg bg-emerald-700 p-2 hover:bg-emerald-800 shrink-0"
+              className="rounded-xl bg-emerald-700 p-3 transition hover:bg-emerald-800"
               title="Limpar lista"
             >
               <Trash2 size={20} />
             </button>
-
           </div>
-
         </div>
 
-        {/* INPUT */}
-        <input
-          type="text"
-          value={estabelecimento}
-          onChange={(e) => aoDefinirEstabelecimento(e.target.value)}
-          placeholder="Nome do mercado..."
-          className="w-full rounded-lg bg-emerald-700 px-3 py-2 text-white placeholder-emerald-200 focus:outline-none focus:ring-2 focus:ring-emerald-300"
-        />
-
-      </div>
-    </header>
-  );
-}
+        {/* ==============================
