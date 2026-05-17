@@ -31,13 +31,10 @@ function App() {
 
   const [aba, setAba] = useState("compras");
 
-  // ==============================
-  // TEMA LOCAL
-  // ==============================
   const [tema, setTema] = useState("claro");
 
   // ==============================
-  // SINCRONIZA TEMA DA LISTA
+  // SINCRONIZA TEMA
   // ==============================
   useEffect(() => {
     if (!lista) return;
@@ -48,11 +45,10 @@ function App() {
   }, [lista]);
 
   // ==============================
-  // APLICA TEMA NO DOM (TAILWIND CORRETO)
+  // DARK MODE (CORRETO)
   // ==============================
   useEffect(() => {
     const root = document.documentElement;
-
     root.classList.toggle("dark", tema === "escuro");
   }, [tema]);
 
@@ -64,29 +60,21 @@ function App() {
   };
 
   // ==============================
-  // LOADING AUTH
+  // LOADING
   // ==============================
   if (loading) {
     return (
-      <div className="flex min-h-screen items-center justify-center">
+      <div className="flex min-h-screen items-center justify-center bg-gray-50 dark:bg-slate-900 text-gray-900 dark:text-white">
         <p>Carregando...</p>
       </div>
     );
   }
 
-  // ==============================
-  // USUÁRIO NÃO LOGADO
-  // ==============================
-  if (!usuario) {
-    return <Login />;
-  }
+  if (!usuario) return <Login />;
 
-  // ==============================
-  // LOADING LISTA
-  // ==============================
   if (!lista || !setLista) {
     return (
-      <div className="flex min-h-screen items-center justify-center">
+      <div className="flex min-h-screen items-center justify-center bg-gray-50 dark:bg-slate-900 text-gray-900 dark:text-white">
         <p>Carregando lista...</p>
       </div>
     );
@@ -148,7 +136,8 @@ function App() {
   // RENDER
   // ==============================
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-slate-900">
+    <div className="min-h-screen bg-gray-50 dark:bg-slate-900 text-gray-900 dark:text-white">
+
       <Cabecalho
         usuario={usuario}
         estabelecimento={lista.estabelecimento || ""}
@@ -168,7 +157,6 @@ function App() {
         tema={tema}
         aoDefinirTema={(valor) => {
           setTema(valor);
-
           setLista((prev) => ({
             ...prev,
             tema: valor,
@@ -180,12 +168,13 @@ function App() {
 
         {/* ABAS */}
         <div className="flex gap-2">
+
           <button
             onClick={() => setAba("compras")}
-            className={`flex-1 rounded-lg p-3 font-semibold ${
+            className={`flex-1 rounded-lg p-3 font-semibold transition ${
               aba === "compras"
                 ? "bg-emerald-600 text-white"
-                : "bg-white text-gray-700 dark:bg-slate-800 dark:text-white"
+                : "bg-gray-100 text-gray-700 dark:bg-slate-800 dark:text-white"
             }`}
           >
             Compras
@@ -193,10 +182,10 @@ function App() {
 
           <button
             onClick={() => setAba("historico")}
-            className={`flex-1 rounded-lg p-3 font-semibold ${
+            className={`flex-1 rounded-lg p-3 font-semibold transition ${
               aba === "historico"
                 ? "bg-emerald-600 text-white"
-                : "bg-white text-gray-700 dark:bg-slate-800 dark:text-white"
+                : "bg-gray-100 text-gray-700 dark:bg-slate-800 dark:text-white"
             }`}
           >
             Histórico
@@ -237,15 +226,11 @@ function App() {
               totais={{
                 total: itens.reduce(
                   (acc, item) =>
-                    acc +
-                    (item.quantidade || 0) *
-                      (item.precoUnitario || 0),
+                    acc + (item.quantidade || 0) * (item.precoUnitario || 0),
                   0
                 ),
                 quantidadeItens: itens.length,
-                itensComprados: itens.filter(
-                  (item) => item.comprado
-                ).length,
+                itensComprados: itens.filter((item) => item.comprado).length,
               }}
             />
           </>
