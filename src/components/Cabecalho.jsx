@@ -20,7 +20,7 @@ export default function Cabecalho({
   return (
     <header className="w-full bg-emerald-600 text-white shadow-lg relative">
 
-      {/* BOTÃO TEMA (FLUTUANTE TOPO DIREITO) */}
+      {/* BOTÃO TEMA */}
       <button
         onClick={() => {
           const novo = temaSeguro === "escuro" ? "claro" : "escuro";
@@ -38,17 +38,19 @@ export default function Cabecalho({
       </button>
 
       {/* CONTAINER PRINCIPAL */}
-      <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between px-4 py-6 gap-4">
+      <div className="max-w-6xl mx-auto flex flex-row items-center justify-between px-4 py-6">
 
-        {/* ESQUERDA: LOGO */}
-        <div className="flex items-center gap-3 w-full sm:w-auto justify-center sm:justify-start">
+        {/* ============================== */}
+        {/* ESQUERDA (LOGO) */}
+        {/* ============================== */}
+        <div className="flex items-center gap-3">
 
           <div className="rounded-2xl bg-emerald-700 p-3 shadow-md">
             <ShoppingCart className="text-white" size={30} />
           </div>
 
-          <div className="text-center sm:text-left">
-            <h1 className="text-xl sm:text-2xl md:text-3xl font-bold">
+          <div className="text-left">
+            <h1 className="text-lg sm:text-2xl md:text-3xl font-bold leading-tight">
               Lista de Compras
             </h1>
 
@@ -59,7 +61,9 @@ export default function Cabecalho({
 
         </div>
 
-        {/* DIREITA: AÇÕES */}
+        {/* ============================== */}
+        {/* DIREITA (AÇÕES) */}
+        {/* ============================== */}
         <div className="flex items-center gap-3">
 
           {/* USUÁRIO */}
@@ -86,7 +90,7 @@ export default function Cabecalho({
             <LogOut size={20} />
           </button>
 
-          {/* LIMPAR LISTA */}
+          {/* LIMPAR */}
           <button
             onClick={aoLimpar}
             className="rounded-xl bg-emerald-700 p-3 hover:bg-emerald-800 transition"
