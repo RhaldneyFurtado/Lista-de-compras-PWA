@@ -31,10 +31,13 @@ function App() {
 
   const [aba, setAba] = useState("compras");
 
+  // ==============================
+  // TEMA LOCAL
+  // ==============================
   const [tema, setTema] = useState("claro");
 
   // ==============================
-  // SINCRONIZA TEMA
+  // SINCRONIZA TEMA DA LISTA
   // ==============================
   useEffect(() => {
     if (!lista) return;
@@ -45,7 +48,7 @@ function App() {
   }, [lista]);
 
   // ==============================
-  // DARK MODE (CORRETO)
+  // APLICA TEMA NO DOM
   // ==============================
   useEffect(() => {
     const root = document.documentElement;
@@ -60,21 +63,29 @@ function App() {
   };
 
   // ==============================
-  // LOADING
+  // LOADING AUTH
   // ==============================
   if (loading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-gray-50 dark:bg-slate-900 text-gray-900 dark:text-white">
+      <div className="flex min-h-screen items-center justify-center">
         <p>Carregando...</p>
       </div>
     );
   }
 
-  if (!usuario) return <Login />;
+  // ==============================
+  // USUÁRIO NÃO LOGADO
+  // ==============================
+  if (!usuario) {
+    return <Login />;
+  }
 
+  // ==============================
+  // LOADING LISTA
+  // ==============================
   if (!lista || !setLista) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-gray-50 dark:bg-slate-900 text-gray-900 dark:text-white">
+      <div className="flex min-h-screen items-center justify-center">
         <p>Carregando lista...</p>
       </div>
     );
@@ -133,11 +144,40 @@ function App() {
   };
 
   // ==============================
+  // FUNÇÕES LISTA (CORREÇÃO PRINCIPAL)
+  // ==============================
+  const removerItem = (id) => {
+    setLista((prev) => ({
+      ...prev,
+      itens: prev.itens.filter((i) => i.id !== id),
+    }));
+  };
+
+  const atualizarItem = (id, dados) => {
+    setLista((prev) => ({
+      ...prev,
+      itens: prev.itens.map((i) =>
+        i.id === id ? { ...i, ...dados } : i
+      ),
+    }));
+  };
+
+  const alternarComprado = (id) => {
+    setLista((prev) => ({
+      ...prev,
+      itens: prev.itens.map((i) =>
+        i.id === id
+          ? { ...i, comprado: !i.comprado }
+          : i
+      ),
+    }));
+  };
+
+  // ==============================
   // RENDER
   // ==============================
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-slate-900 text-gray-900 dark:text-white">
-
+    <div className="min-h-screen bg-gray-50 dark:bg-slate-900">
       <Cabecalho
         usuario={usuario}
         estabelecimento={lista.estabelecimento || ""}
@@ -157,6 +197,7 @@ function App() {
         tema={tema}
         aoDefinirTema={(valor) => {
           setTema(valor);
+
           setLista((prev) => ({
             ...prev,
             tema: valor,
@@ -164,89 +205,4 @@ function App() {
         }}
       />
 
-      <main className="mx-auto max-w-4xl space-y-6 px-4 py-6">
-
-        {/* ABAS */}
-        <div className="flex gap-2">
-
-          <button
-            onClick={() => setAba("compras")}
-            className={`flex-1 rounded-lg p-3 font-semibold transition ${
-              aba === "compras"
-                ? "bg-emerald-600 text-white"
-                : "bg-gray-100 text-gray-700 dark:bg-slate-800 dark:text-white"
-            }`}
-          >
-            Compras
-          </button>
-
-          <button
-            onClick={() => setAba("historico")}
-            className={`flex-1 rounded-lg p-3 font-semibold transition ${
-              aba === "historico"
-                ? "bg-emerald-600 text-white"
-                : "bg-gray-100 text-gray-700 dark:bg-slate-800 dark:text-white"
-            }`}
-          >
-            Histórico
-          </button>
-        </div>
-
-        {/* ABA COMPRAS */}
-        {aba === "compras" && (
-          <>
-            <AlternarModo
-              modo={lista.modo}
-              aoAlternar={(modo) =>
-                setLista((prev) => ({ ...prev, modo }))
-              }
-            />
-
-            <FormAdicionar
-              aoAdicionar={(dados) =>
-                setLista((prev) => ({
-                  ...prev,
-                  itens: [
-                    ...prev.itens,
-                    {
-                      id: crypto.randomUUID(),
-                      nome: dados.nome,
-                      quantidade: dados.quantidade,
-                      precoUnitario: 0,
-                      comprado: false,
-                    },
-                  ],
-                }))
-              }
-            />
-
-            <ListaItens itens={itens} />
-
-            <ResumoTotal
-              totais={{
-                total: itens.reduce(
-                  (acc, item) =>
-                    acc + (item.quantidade || 0) * (item.precoUnitario || 0),
-                  0
-                ),
-                quantidadeItens: itens.length,
-                itensComprados: itens.filter((item) => item.comprado).length,
-              }}
-            />
-          </>
-        )}
-
-        {/* ABA HISTÓRICO */}
-        {aba === "historico" && (
-          <Historico
-            historico={historico}
-            carregando={carregando}
-            deletarCompra={deletarCompra}
-          />
-        )}
-      </main>
-    </div>
-  );
-}
-
-export default App;
+      <main className="mx-auto max-w-4xl
