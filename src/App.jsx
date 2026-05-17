@@ -17,7 +17,6 @@ import AlternarModo from "./components/AlternarModo";
 import FormAdicionar from "./components/FormAdicionar";
 import ListaItens from "./components/ListaItens";
 import ResumoTotal from "./components/ResumoTotal";
-import Login from "./components/Login";
 import Historico from "./components/Historico";
 
 // ==============================
@@ -26,15 +25,17 @@ import Historico from "./components/Historico";
 function App() {
   const { usuario, loading } = useAuth();
 
-  const { lista, setLista } = useListaFirestore(usuario);
+  const { lista, setLista } = useListaFirestore(usuario || null);
   const { historico, carregando, deletarCompra } =
-    useHistoricoCompras(usuario);
+    useHistoricoCompras(usuario || null);
 
   const [aba, setAba] = useState("compras");
   const [tema, setTema] = useState("claro");
 
+  const itens = lista?.itens || [];
+
   // ==============================
-  // PROTEÇÃO (EVITA TELA BRANCA)
+  // PROTEÇÃO DE RENDER (SEM QUEBRAR HOOKS)
   // ==============================
   if (loading) {
     return (
@@ -44,27 +45,29 @@ function App() {
     );
   }
 
-  if (!usuario || !lista) {
+  if (!usuario) {
     return (
       <div className="flex min-h-screen items-center justify-center">
-        <p>Carregando dados...</p>
+        <p>Usuário não autenticado</p>
       </div>
     );
   }
 
-  const itens = lista?.itens || [];
+  if (!lista) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <p>Carregando lista...</p>
+      </div>
+    );
+  }
 
   // ==============================
-  // SINCRONIZA TEMA
+  // TEMA
   // ==============================
   useEffect(() => {
-    if (!lista?.tema) return;
-    setTema(lista.tema);
+    if (lista?.tema) setTema(lista.tema);
   }, [lista?.tema]);
 
-  // ==============================
-  // APLICA TEMA NO DOM
-  // ==============================
   useEffect(() => {
     document.documentElement.classList.toggle(
       "dark",
@@ -94,14 +97,12 @@ function App() {
     );
 
     const id =
-      (typeof crypto !== "undefined" &&
-        crypto.randomUUID &&
-        crypto.randomUUID()) ||
+      (crypto?.randomUUID && crypto.randomUUID()) ||
       Math.random().toString(36).substring(2);
 
     const compra = {
       id,
-      estabelecimento: lista.estabelecimento,
+      estabelecimento: lista.estabelecimento || "",
       itens,
       total,
       data: new Date().toISOString(),
@@ -133,36 +134,6 @@ function App() {
   };
 
   // ==============================
-  // FUNÇÕES SEGURAS
-  // ==============================
-  const removerItem = (id) => {
-    setLista((prev) => ({
-      ...prev,
-      itens: (prev?.itens || []).filter((i) => i.id !== id),
-    }));
-  };
-
-  const atualizarItem = (id, dados) => {
-    setLista((prev) => ({
-      ...prev,
-      itens: (prev?.itens || []).map((i) =>
-        i.id === id ? { ...i, ...dados } : i
-      ),
-    }));
-  };
-
-  const alternarComprado = (id) => {
-    setLista((prev) => ({
-      ...prev,
-      itens: (prev?.itens || []).map((i) =>
-        i.id === id
-          ? { ...i, comprado: !i.comprado }
-          : i
-      ),
-    }));
-  };
-
-  // ==============================
   // RENDER
   // ==============================
   return (
@@ -185,13 +156,7 @@ function App() {
         }
         aoLogout={fazerLogout}
         tema={tema}
-        aoDefinirTema={(valor) => {
-          setTema(valor);
-          setLista((prev) => ({
-            ...prev,
-            tema: valor,
-          }));
-        }}
+        aoDefinirTema={setTema}
       />
 
       <main className="mx-auto max-w-4xl space-y-6 px-4 py-6">
@@ -200,28 +165,19 @@ function App() {
         <div className="flex gap-2">
           <button
             onClick={() => setAba("compras")}
-            className={`flex-1 rounded-lg p-3 font-semibold ${
-              aba === "compras"
-                ? "bg-emerald-600 text-white"
-                : "bg-white text-gray-700 dark:bg-slate-800 dark:text-white"
-            }`}
+            className="flex-1 rounded-lg p-3 font-semibold bg-emerald-600 text-white"
           >
             Compras
           </button>
 
           <button
             onClick={() => setAba("historico")}
-            className={`flex-1 rounded-lg p-3 font-semibold ${
-              aba === "historico"
-                ? "bg-emerald-600 text-white"
-                : "bg-white text-gray-700 dark:bg-slate-800 dark:text-white"
-            }`}
+            className="flex-1 rounded-lg p-3 font-semibold bg-white text-gray-700 dark:bg-slate-800 dark:text-white"
           >
             Histórico
           </button>
         </div>
 
-        {/* COMPRAS */}
         {aba === "compras" && (
           <>
             <AlternarModo
@@ -238,10 +194,7 @@ function App() {
                   itens: [
                     ...prev.itens,
                     {
-                      id:
-                        (typeof crypto !== "undefined" &&
-                          crypto.randomUUID &&
-                          crypto.randomUUID()) ||
+                      id: crypto?.randomUUID?.() ||
                         Math.random().toString(36).substring(2),
                       nome: dados.nome,
                       quantidade: dados.quantidade,
@@ -256,9 +209,30 @@ function App() {
             <ListaItens
               itens={itens}
               modo={lista.modo}
-              aoRemover={removerItem}
-              aoAtualizar={atualizarItem}
-              aoAlternarComprado={alternarComprado}
+              aoRemover={(id) =>
+                setLista((prev) => ({
+                  ...prev,
+                  itens: prev.itens.filter((i) => i.id !== id),
+                }))
+              }
+              aoAtualizar={(id, dados) =>
+                setLista((prev) => ({
+                  ...prev,
+                  itens: prev.itens.map((i) =>
+                    i.id === id ? { ...i, ...dados } : i
+                  ),
+                }))
+              }
+              aoAlternarComprado={(id) =>
+                setLista((prev) => ({
+                  ...prev,
+                  itens: prev.itens.map((i) =>
+                    i.id === id
+                      ? { ...i, comprado: !i.comprado }
+                      : i
+                  ),
+                }))
+              }
             />
 
             <ResumoTotal
@@ -272,12 +246,11 @@ function App() {
                 ),
                 quantidadeItens: itens.length,
                 itensComprados: itens.filter(
-                  (item) => item.comprado
+                  (i) => i.comprado
                 ).length,
               }}
             />
 
-            {/* BOTÃO FINALIZAR COMPRA */}
             {lista.modo === "feira" && itens.length > 0 && (
               <button
                 onClick={finalizarCompra}
@@ -289,7 +262,6 @@ function App() {
           </>
         )}
 
-        {/* HISTÓRICO */}
         {aba === "historico" && (
           <Historico
             historico={historico}
