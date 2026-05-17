@@ -32,7 +32,7 @@ function App() {
   const [aba, setAba] = useState("compras");
 
   // ==============================
-  // TEMA
+  // TEMA LOCAL
   // ==============================
   const [tema, setTema] = useState("claro");
 
@@ -48,22 +48,14 @@ function App() {
   }, [lista]);
 
   // ==============================
-  // APLICA TEMA NO DOM (ESTÁVEL)
+  // APLICA TEMA NO DOM
   // ==============================
   useEffect(() => {
-    const root = document.documentElement;
+    document.body.classList.remove("tema-claro", "tema-escuro");
 
-    // ==============================
-    // LIMPA ESTADO ANTERIOR
-    // ==============================
-    root.classList.remove("dark");
-
-    // ==============================
-    // APLICA TEMA ESCURO
-    // ==============================
-    if (tema === "escuro") {
-      root.classList.add("dark");
-    }
+    document.body.classList.add(
+      tema === "escuro" ? "tema-escuro" : "tema-claro"
+    );
   }, [tema]);
 
   // ==============================
@@ -115,7 +107,7 @@ function App() {
         acc +
         (item.quantidade || 0) *
           (item.precoUnitario || 0),
-      0,
+      0
     );
 
     const id = crypto.randomUUID();
@@ -133,7 +125,7 @@ function App() {
 
     await setDoc(
       doc(db, "users", usuario.uid, "compras", id),
-      compra,
+      compra
     );
 
     await setDoc(
@@ -143,7 +135,7 @@ function App() {
         estabelecimento: "",
         tema,
         itens: [],
-      },
+      }
     );
 
     setLista({
@@ -189,7 +181,6 @@ function App() {
       />
 
       <main className="mx-auto max-w-4xl space-y-6 px-4 py-6">
-
         {/* ABAS */}
         <div className="flex gap-2">
           <button
@@ -197,7 +188,7 @@ function App() {
             className={`flex-1 rounded-lg p-3 font-semibold ${
               aba === "compras"
                 ? "bg-emerald-600 text-white"
-                : "bg-white dark:bg-slate-800 text-gray-700 dark:text-white"
+                : "bg-white text-gray-700 dark:bg-slate-800 dark:text-white"
             }`}
           >
             Compras
@@ -208,7 +199,7 @@ function App() {
             className={`flex-1 rounded-lg p-3 font-semibold ${
               aba === "historico"
                 ? "bg-emerald-600 text-white"
-                : "bg-white dark:bg-slate-800 text-gray-700 dark:text-white"
+                : "bg-white text-gray-700 dark:bg-slate-800 dark:text-white"
             }`}
           >
             Histórico
@@ -221,7 +212,10 @@ function App() {
             <AlternarModo
               modo={lista.modo}
               aoAlternar={(modo) =>
-                setLista((prev) => ({ ...prev, modo }))
+                setLista((prev) => ({
+                  ...prev,
+                  modo,
+                }))
               }
             />
 
@@ -252,11 +246,11 @@ function App() {
                     acc +
                     (item.quantidade || 0) *
                       (item.precoUnitario || 0),
-                  0,
+                  0
                 ),
                 quantidadeItens: itens.length,
                 itensComprados: itens.filter(
-                  (item) => item.comprado,
+                  (item) => item.comprado
                 ).length,
               }}
             />
