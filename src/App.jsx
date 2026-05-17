@@ -48,14 +48,12 @@ function App() {
   }, [lista]);
 
   // ==============================
-  // APLICA TEMA NO DOM
+  // APLICA TEMA NO DOM (TAILWIND CORRETO)
   // ==============================
   useEffect(() => {
-    document.body.classList.remove("tema-claro", "tema-escuro");
+    const root = document.documentElement;
 
-    document.body.classList.add(
-      tema === "escuro" ? "tema-escuro" : "tema-claro"
-    );
+    root.classList.toggle("dark", tema === "escuro");
   }, [tema]);
 
   // ==============================
@@ -104,9 +102,7 @@ function App() {
 
     const total = itens.reduce(
       (acc, item) =>
-        acc +
-        (item.quantidade || 0) *
-          (item.precoUnitario || 0),
+        acc + (item.quantidade || 0) * (item.precoUnitario || 0),
       0
     );
 
@@ -181,6 +177,7 @@ function App() {
       />
 
       <main className="mx-auto max-w-4xl space-y-6 px-4 py-6">
+
         {/* ABAS */}
         <div className="flex gap-2">
           <button
@@ -212,10 +209,7 @@ function App() {
             <AlternarModo
               modo={lista.modo}
               aoAlternar={(modo) =>
-                setLista((prev) => ({
-                  ...prev,
-                  modo,
-                }))
+                setLista((prev) => ({ ...prev, modo }))
               }
             />
 
