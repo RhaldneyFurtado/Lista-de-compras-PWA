@@ -5,14 +5,6 @@
 import { Trash2 } from "lucide-react";
 import { ItemFeira } from "./ItemFeira";
 
-/**
- * Componente responsável por renderizar
- * todos os itens da lista de compras.
- *
- * Modos:
- * - Planejamento
- * - Feira
- */
 export default function ListaItens({
   itens,
   modo,
@@ -20,25 +12,23 @@ export default function ListaItens({
   aoAtualizar,
   aoAlternarComprado,
 }) {
-  // ==============================
-  // LISTA VAZIA
-  // ==============================
   if (!itens.length) {
     return (
-      <div className="rounded-lg bg-white p-6 text-center shadow">
-        <p className="text-gray-500">Nenhum item adicionado ainda.</p>
+      <div className="rounded-lg bg-white dark:bg-slate-800 p-6 text-center shadow">
+        <p className="text-gray-500 dark:text-gray-300">
+          Nenhum item adicionado ainda.
+        </p>
       </div>
     );
   }
 
-  // ==============================
-  // RENDERIZAÇÃO
-  // ==============================
   return (
     <div className="space-y-4">
+
       {itens.map((item) => (
         <div key={item.id}>
-          {/* MODO FEIRA */}
+
+          {/* FEIRA */}
           {modo === "feira" ? (
             <ItemFeira
               item={item}
@@ -47,13 +37,17 @@ export default function ListaItens({
               onToggleComprado={aoAlternarComprado}
             />
           ) : (
-            /* MODO PLANEJAMENTO */
-            <div className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm">
+
+            /* PLANEJAMENTO */
+            <div className="rounded-lg border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-4 shadow-sm">
+
               <div className="flex items-center justify-between gap-3">
-                {/* LADO ESQUERDO */}
+
+                {/* ESQUERDA */}
                 <div className="flex flex-1 items-center gap-3">
-                  {/* CHECKBOX + NOME AGRUPADOS */}
+
                   <div className="flex items-center gap-3">
+
                     <input
                       type="checkbox"
                       checked={item.comprado}
@@ -64,17 +58,20 @@ export default function ListaItens({
                     <p
                       className={`font-medium ${
                         item.comprado
-                          ? "text-gray-400 line-through"
-                          : "text-gray-800"
+                          ? "text-gray-400 dark:text-gray-500 line-through"
+                          : "text-gray-800 dark:text-gray-100"
                       }`}
                     >
                       {item.nome}
                     </p>
+
                   </div>
 
-                  {/* QUANTIDADE */}
                   <div className="ml-6 flex items-center gap-2">
-                    <label className="text-sm text-gray-500">Quantidade:</label>
+
+                    <label className="text-sm text-gray-500 dark:text-gray-400">
+                      Quantidade:
+                    </label>
 
                     <input
                       type="number"
@@ -85,24 +82,31 @@ export default function ListaItens({
                           quantidade: Number(e.target.value) || 1,
                         })
                       }
-                      className="w-20 rounded border border-gray-300 px-2 py-1 text-center focus:border-emerald-500 focus:outline-none"
+                      className="w-20 rounded border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-700 px-2 py-1 text-center text-gray-900 dark:text-white focus:border-emerald-500 focus:outline-none"
                     />
+
                   </div>
+
                 </div>
 
-                {/* BOTÃO REMOVER */}
+                {/* REMOVER */}
                 <button
                   onClick={() => aoRemover(item.id)}
-                  className="rounded-lg p-2 text-red-500 transition-colors hover:bg-red-50 hover:text-red-700"
+                  className="rounded-lg p-2 text-red-500 transition-colors hover:bg-red-50 dark:hover:bg-slate-700 hover:text-red-700"
                   title="Remover item"
                 >
                   <Trash2 size={18} />
                 </button>
+
               </div>
+
             </div>
+
           )}
+
         </div>
       ))}
+
     </div>
   );
 }
