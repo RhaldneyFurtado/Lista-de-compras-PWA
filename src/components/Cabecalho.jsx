@@ -22,11 +22,23 @@ export default function Cabecalho({
 }) {
   const temaSeguro = tema || "claro";
 
+  // ==============================
+  // TOGGLE TEMA (SEGURO)
+  // ==============================
+  const alternarTema = () => {
+    if (!aoDefinirTema) return;
+
+    const novo =
+      temaSeguro === "escuro" ? "claro" : "escuro";
+
+    aoDefinirTema(novo);
+  };
+
   return (
     <header className="w-full bg-emerald-600 text-white shadow-lg">
 
       {/* ============================== */}
-      {/* CONTAINER FULL WIDTH */}
+      {/* CONTAINER */}
       {/* ============================== */}
       <div className="w-full px-4 pt-6 pb-6">
 
@@ -41,10 +53,7 @@ export default function Cabecalho({
           <div className="flex items-center gap-3">
 
             <div className="rounded-2xl bg-emerald-700 p-3 shadow-md">
-              <ShoppingCart
-                className="text-white"
-                size={30}
-              />
+              <ShoppingCart className="text-white" size={30} />
             </div>
 
             <div>
@@ -65,20 +74,11 @@ export default function Cabecalho({
 
             {/* TEMA */}
             <button
-              onClick={() => {
-                const novo =
-                  temaSeguro === "escuro"
-                    ? "claro"
-                    : "escuro";
-
-                aoDefinirTema?.(novo);
-              }}
+              onClick={alternarTema}
               className="rounded-xl bg-emerald-700 p-3 transition hover:bg-emerald-800"
               title="Tema"
             >
-              {temaSeguro === "escuro"
-                ? "☀️"
-                : "🌙"}
+              {temaSeguro === "escuro" ? "☀️" : "🌙"}
             </button>
 
             {/* USUÁRIO */}
@@ -123,9 +123,7 @@ export default function Cabecalho({
           type="text"
           value={estabelecimento}
           onChange={(e) =>
-            aoDefinirEstabelecimento(
-              e.target.value
-            )
+            aoDefinirEstabelecimento(e.target.value)
           }
           placeholder="Nome do mercado..."
           className="
