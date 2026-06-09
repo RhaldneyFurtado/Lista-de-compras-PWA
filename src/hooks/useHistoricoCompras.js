@@ -58,9 +58,16 @@ export function useHistoricoCompras(usuario) {
     }
   };
 
+  const adicionarCompraLocal = (compra) => {
+    setHistorico((prev) =>
+      [compra, ...prev].sort((a, b) => new Date(b.data) - new Date(a.data))
+    );
+  };
+
   return {
     historico,
     carregando,
     deletarCompra,
+    adicionarCompraLocal,
   };
 }

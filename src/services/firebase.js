@@ -4,6 +4,10 @@
 
 import { initializeApp } from "firebase/app";
 import {
+  initializeAppCheck,
+  ReCaptchaEnterpriseProvider,
+} from "firebase/app-check";
+import {
   getAuth,
   GoogleAuthProvider,
   setPersistence,
@@ -16,7 +20,7 @@ import { getFirestore } from "firebase/firestore";
 // ==============================
 
 const firebaseConfig = {
-  apiKey: "AIzaSyBN-jgFWi10Onb0atB7ty24IhfRSMMxulU",
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
   authDomain: "lista-de-compras-pwa-64fac.firebaseapp.com",
   projectId: "lista-de-compras-pwa-64fac",
   storageBucket: "lista-de-compras-pwa-64fac.appspot.com",
@@ -31,8 +35,22 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 
 // ==============================
+// APP CHECK (PROTEÇÃO)
+// ==============================
+
+if (typeof window !== "undefined" && import.meta.env.VITE_RECAPTCHA_SITE_KEY) {
+  initializeAppCheck(app, {
+    provider: new ReCaptchaEnterpriseProvider(
+      import.meta.env.VITE_RECAPTCHA_SITE_KEY,
+    ),
+    isTokenAutoRefreshEnabled: true,
+  });
+}
+
+// ==============================
 // AUTH
 // ==============================
+
 export const auth = getAuth(app);
 
 // 🔥 PERSISTÊNCIA DO LOGIN (EVITA SUMIR USUÁRIO)
@@ -47,4 +65,5 @@ googleProvider.setCustomParameters({
 // ==============================
 // FIRESTORE
 // ==============================
+
 export const db = getFirestore(app);
