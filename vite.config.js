@@ -4,6 +4,27 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import { VitePWA } from "vite-plugin-pwa";
+import fs from "fs";
+
+// ==============================
+// PLUGIN CUSTOMIZADO - GERAR VERSION.JSON
+// ==============================
+const generateVersionFile = {
+  name: "generate-version-file",
+  generateBundle() {
+    const packageJson = JSON.parse(fs.readFileSync("./package.json", "utf-8"));
+    const versionData = {
+      version: packageJson.version,
+      buildTime: new Date().toISOString(),
+    };
+
+    this.emitFile({
+      type: "asset",
+      fileName: "version.json",
+      source: JSON.stringify(versionData, null, 2),
+    });
+  },
+};
 
 // ==============================
 // CONFIGURAÇÃO PRINCIPAL
@@ -15,10 +36,21 @@ export default defineConfig({
   base: "/Lista-de-compras-PWA/",
 
   // ==============================
+  // INJETAR VERSÃO NO BUILD
+  // ==============================
+  define: {
+    __APP_VERSION__: JSON.stringify(
+      JSON.parse(fs.readFileSync("./package.json", "utf-8")).version,
+    ),
+    __BUILD_TIME__: JSON.stringify(new Date().toISOString()),
+  },
+
+  // ==============================
   // PLUGINS
   // ==============================
   plugins: [
     react(),
+    generateVersionFile,
 
     VitePWA({
       // ==============================

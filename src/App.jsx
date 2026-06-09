@@ -7,6 +7,7 @@ import { useState, useEffect } from "react";
 import { useAuth } from "./hooks/useAuth";
 import { useListaFirestore } from "./hooks/useListaFirestore";
 import { useHistoricoCompras } from "./hooks/useHistoricoCompras";
+import { useVersionCheck } from "./hooks/useVersionCheck";
 
 import { signOut } from "firebase/auth";
 import { auth, db } from "./services/firebase";
@@ -23,6 +24,8 @@ import Historico from "./components/Historico";
 // APP
 // ==============================
 function App() {
+  // Verificar atualizações de versão
+  useVersionCheck();
   const { usuario, loading } = useAuth();
 
   const { lista, setLista } = useListaFirestore(usuario);

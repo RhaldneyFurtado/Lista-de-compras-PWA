@@ -24,10 +24,8 @@ export default function ListaItens({
 
   return (
     <div className="space-y-4">
-
       {itens.map((item) => (
         <div key={item.id}>
-
           {/* FEIRA */}
           {modo === "feira" ? (
             <ItemFeira
@@ -37,17 +35,12 @@ export default function ListaItens({
               onToggleComprado={aoAlternarComprado}
             />
           ) : (
-
             /* PLANEJAMENTO */
             <div className="rounded-lg border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-4 shadow-sm">
-
               <div className="flex items-center justify-between gap-3">
-
                 {/* ESQUERDA */}
                 <div className="flex flex-1 items-center gap-3">
-
                   <div className="flex items-center gap-3">
-
                     <input
                       type="checkbox"
                       checked={item.comprado}
@@ -64,29 +57,35 @@ export default function ListaItens({
                     >
                       {item.nome}
                     </p>
-
                   </div>
 
                   <div className="ml-6 flex items-center gap-2">
-
                     <label className="text-sm text-gray-500 dark:text-gray-400">
                       Quantidade:
                     </label>
 
                     <input
-                      type="number"
-                      min="1"
+                      type="text"
+                      inputMode="numeric"
                       value={item.quantidade}
-                      onChange={(e) =>
-                        aoAtualizar(item.id, {
-                          quantidade: Number(e.target.value) || 1,
-                        })
-                      }
+                      onChange={(e) => {
+                        const valor = e.target.value;
+                        // Permite apenas números
+                        if (valor === "" || /^\d+$/.test(valor)) {
+                          aoAtualizar(item.id, {
+                            quantidade: valor === "" ? "" : Number(valor),
+                          });
+                        }
+                      }}
+                      onBlur={(e) => {
+                        const valor = Number(e.target.value);
+                        if (!valor || valor < 1) {
+                          aoAtualizar(item.id, { quantidade: 1 });
+                        }
+                      }}
                       className="w-20 rounded border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-700 px-2 py-1 text-center text-gray-900 dark:text-white focus:border-emerald-500 focus:outline-none"
                     />
-
                   </div>
-
                 </div>
 
                 {/* REMOVER */}
@@ -97,16 +96,11 @@ export default function ListaItens({
                 >
                   <Trash2 size={18} />
                 </button>
-
               </div>
-
             </div>
-
           )}
-
         </div>
       ))}
-
     </div>
   );
 }
