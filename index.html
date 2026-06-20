@@ -2,23 +2,86 @@
 <html lang="pt-BR">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/png" href="/pwa-192x192.png" />
-    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-    <link rel="manifest" href="/manifest.webmanifest" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- ============================== -->
+    <!-- FAVICON -->
+    <!-- ============================== -->
+    <link
+      rel="icon"
+      type="image/png"
+      href="/Lista-de-compras-PWA/pwa-192x192.png"
+    />
+
+    <!-- ============================== -->
+    <!-- APPLE TOUCH ICON (iOS) -->
+    <!-- ============================== -->
+    <link
+      rel="apple-touch-icon"
+      href="/Lista-de-compras-PWA/apple-touch-icon.png"
+    />
+    <link
+      rel="apple-touch-icon"
+      sizes="152x152"
+      href="/Lista-de-compras-PWA/pwa-192x192.png"
+    />
+    <link
+      rel="apple-touch-icon"
+      sizes="180x180"
+      href="/Lista-de-compras-PWA/apple-touch-icon.png"
+    />
+    <link
+      rel="apple-touch-icon"
+      sizes="167x167"
+      href="/Lista-de-compras-PWA/pwa-192x192.png"
+    />
+
+    <!-- ============================== -->
+    <!-- MANIFESTO PWA -->
+    <!-- ============================== -->
+    <link rel="manifest" href="/Lista-de-compras-PWA/manifest.webmanifest" />
+
+    <!-- ============================== -->
+    <!-- RESPONSIVIDADE -->
+    <!-- ============================== -->
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+
+    <!-- ============================== -->
+    <!-- TEMA DO APP -->
+    <!-- ============================== -->
     <meta name="theme-color" content="#10b981" />
+    <meta name="msapplication-TileColor" content="#10b981" />
+
+    <!-- ============================== -->
+    <!-- SEO -->
+    <!-- ============================== -->
     <meta
       name="description"
       content="Lista de compras inteligente - organize suas compras de forma simples e rapida"
     />
     <meta name="application-name" content="Lista de Compras" />
     <meta name="apple-mobile-web-app-title" content="Compras" />
+
+    <!-- ============================== -->
+    <!-- CONFIG PWA -->
+    <!-- ============================== -->
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta
+      name="apple-mobile-web-app-status-bar-style"
+      content="black-translucent"
+    />
+    <meta name="format-detection" content="telephone=no" />
+
+    <!-- ============================== -->
+    <!-- TITULO -->
+    <!-- ============================== -->
     <title>Lista de Compras Inteligente</title>
     <base target="_blank" />
   </head>
+
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
