@@ -17,11 +17,7 @@ export default [
     languageOptions: {
       ecmaVersion: "latest",
       sourceType: "module",
-      parserOptions: {
-        ecmaFeatures: {
-          jsx: true,
-        },
-      },
+      parserOptions: { ecmaFeatures: { jsx: true } },
       globals: {
         console: "readonly",
         crypto: "readonly",
@@ -29,12 +25,11 @@ export default [
         setTimeout: "readonly",
         clearTimeout: "readonly",
         window: "readonly",
+        __APP_VERSION__: "readonly",
+        __BUILD_TIME__: "readonly",
       },
     },
-    plugins: {
-      "react-hooks": reactHooks,
-      "react-refresh": reactRefresh,
-    },
+    plugins: { "react-hooks": reactHooks, "react-refresh": reactRefresh },
     rules: {
       ...reactHooks.configs.recommended.rules,
       "no-unused-vars": "off",
@@ -48,10 +43,7 @@ export default [
     files: ["tailwind.config.js", "postcss.config.cjs"],
     languageOptions: {
       sourceType: "commonjs",
-      globals: {
-        module: "readonly",
-        require: "readonly",
-      },
+      globals: { module: "readonly", require: "readonly" },
     },
   },
 ];

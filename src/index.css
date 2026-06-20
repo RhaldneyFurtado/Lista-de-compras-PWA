@@ -1,73 +1,53 @@
-/* ==============================
-   TAILWIND BASE
-============================== */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* ==============================
-   RESET GLOBAL
-============================== */
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  font-family:
+    system-ui,
+    -apple-system,
+    Segoe UI,
+    Roboto,
+    Arial,
+    sans-serif;
 }
-
-/* ==============================
-   BASE DO APP
-============================== */
 body {
-  transition: background 0.3s ease, color 0.3s ease;
+  transition:
+    background 0.3s ease,
+    color 0.3s ease;
 }
-
-/* ==============================
-   CONTAINER
-============================== */
 .container {
   max-width: 900px;
   margin: 0 auto;
   padding: 20px;
 }
-
-/* ==============================
-   CABEÇALHO BASE
-============================== */
 header {
   width: 100%;
   padding: 20px;
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
 }
 
-/* ==============================
-   CARD (TAILWIND CONTROLADO)
-============================== */
 @layer components {
   .card {
     @apply rounded-2xl p-4 mt-4 shadow-md bg-white dark:bg-slate-800 text-gray-900 dark:text-white;
   }
-
   .item {
     @apply flex justify-between items-center p-3 rounded-xl bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700;
   }
-
   .btn {
     @apply px-4 py-2 rounded-xl transition;
   }
-
   .btn-primary {
     @apply bg-emerald-600 text-white hover:bg-emerald-700;
   }
-
   .btn-danger {
     @apply bg-red-500 text-white hover:bg-red-600;
   }
 }
 
-/* ==============================
-   INPUTS
-============================== */
 input {
   width: 100%;
   padding: 12px;
@@ -77,34 +57,26 @@ input {
   transition: 0.2s;
   background: white;
 }
-
 .dark input {
   background: #0f172a;
   color: white;
   border-color: #334155;
 }
 
-/* ==============================
-   UTILITÁRIOS
-============================== */
 .flex {
   display: flex;
 }
-
 .center {
   display: flex;
   align-items: center;
   justify-content: center;
 }
-
 .gap {
   gap: 10px;
 }
-
 .shadow {
   box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
 }
-
 .rounded {
   border-radius: 12px;
 }

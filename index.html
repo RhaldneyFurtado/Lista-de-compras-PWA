@@ -2,90 +2,25 @@
 <html lang="pt-BR">
   <head>
     <meta charset="UTF-8" />
-
-    <!-- ============================== -->
-    <!-- ÍCONES DO APP -->
-    <!-- ============================== -->
-    <link
-      rel="icon"
-      type="image/x-icon"
-      href="/Lista-de-compras-PWA/favicon.ico"
-    />
-
-    <link
-      rel="apple-touch-icon"
-      href="/Lista-de-compras-PWA/apple-touch-icon.png"
-    />
-
-    <!-- ============================== -->
-    <!-- MANIFESTO PWA -->
-    <!-- ============================== -->
-    <link
-      rel="manifest"
-      href="/Lista-de-compras-PWA/manifest.webmanifest"
-    />
-
-    <!-- ============================== -->
-    <!-- RESPONSIVIDADE -->
-    <!-- ============================== -->
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1.0"
-    />
-
-    <!-- ============================== -->
-    <!-- TEMA DO APP -->
-    <!-- ============================== -->
-    <meta
-      name="theme-color"
-      content="#10b981"
-    />
-
-    <!-- ============================== -->
-    <!-- SEO -->
-    <!-- ============================== -->
+    <link rel="icon" type="image/png" href="/pwa-192x192.png" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#10b981" />
     <meta
       name="description"
-      content="Lista de compras inteligente - organize suas compras de forma simples e rápida"
+      content="Lista de compras inteligente - organize suas compras de forma simples e rapida"
     />
-
-    <meta
-      name="application-name"
-      content="Lista de Compras"
-    />
-
-    <meta
-      name="apple-mobile-web-app-title"
-      content="Compras"
-    />
-
-    <!-- ============================== -->
-    <!-- CONFIG iOS -->
-    <!-- ============================== -->
-    <meta
-      name="apple-mobile-web-app-capable"
-      content="yes"
-    />
-
-    <meta
-      name="apple-mobile-web-app-status-bar-style"
-      content="default"
-    />
-
-    <title>
-      Lista de Compras Inteligente
-    </title>
+    <meta name="application-name" content="Lista de Compras" />
+    <meta name="apple-mobile-web-app-title" content="Compras" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <title>Lista de Compras Inteligente</title>
+    <base target="_blank" />
   </head>
-
   <body>
     <div id="root"></div>
-
-    <!-- ============================== -->
-    <!-- ENTRY POINT -->
-    <!-- ============================== -->
-    <script
-      type="module"
-      src="/src/main.jsx"
-    ></script>
+    <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>

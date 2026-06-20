@@ -1,7 +1,3 @@
-// ==============================
-// FIREBASE CONFIGURAÇÃO CENTRAL
-// ==============================
-
 import { initializeApp } from "firebase/app";
 import {
   initializeAppCheck,
@@ -15,12 +11,8 @@ import {
 } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 
-// ==============================
-// CONFIG FIREBASE
-// ==============================
-
 const firebaseConfig = {
-  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  apiKey: "AIzaSyBN-jgFWi10Onb0atB7ty24IhfRSMMxulU",
   authDomain: "lista-de-compras-pwa-64fac.firebaseapp.com",
   projectId: "lista-de-compras-pwa-64fac",
   storageBucket: "lista-de-compras-pwa-64fac.appspot.com",
@@ -28,42 +20,28 @@ const firebaseConfig = {
   appId: "1:922020197463:web:41e9aa3c04bf76c7941f12",
 };
 
-// ==============================
-// INIT FIREBASE
-// ==============================
+console.log(
+  "Firebase API Key carregada:",
+  firebaseConfig.apiKey ? "Sim" : "Nao",
+);
 
 const app = initializeApp(firebaseConfig);
 
-// ==============================
-// APP CHECK (PROTEÇÃO)
-// ==============================
-
-if (typeof window !== "undefined" && import.meta.env.VITE_RECAPTCHA_SITE_KEY) {
-  initializeAppCheck(app, {
-    provider: new ReCaptchaEnterpriseProvider(
-      import.meta.env.VITE_RECAPTCHA_SITE_KEY,
-    ),
-    isTokenAutoRefreshEnabled: true,
-  });
+if (typeof window !== "undefined") {
+  const recaptchaKey = "6LcPX80sAAAAADDR6FC6ZFr_Wb_-bdwCbCD1tnfr";
+  if (recaptchaKey) {
+    initializeAppCheck(app, {
+      provider: new ReCaptchaEnterpriseProvider(recaptchaKey),
+      isTokenAutoRefreshEnabled: true,
+    });
+    console.log("App Check inicializado com ReCaptcha Enterprise");
+  } else {
+    console.warn("ReCaptcha Site Key nao configurada - App Check desativado");
+  }
 }
 
-// ==============================
-// AUTH
-// ==============================
-
 export const auth = getAuth(app);
-
-// 🔥 PERSISTÊNCIA DO LOGIN (EVITA SUMIR USUÁRIO)
 setPersistence(auth, browserLocalPersistence);
-
-// 🔥 GOOGLE PROVIDER (FORÇA ESCOLHA DE CONTA)
 export const googleProvider = new GoogleAuthProvider();
-googleProvider.setCustomParameters({
-  prompt: "select_account",
-});
-
-// ==============================
-// FIRESTORE
-// ==============================
-
+googleProvider.setCustomParameters({ prompt: "select_account" });
 export const db = getFirestore(app);

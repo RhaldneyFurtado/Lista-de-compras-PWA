@@ -1,26 +1,15 @@
-// ==============================
-// LISTA FIRESTORE POR USUÁRIO
-// ==============================
-
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { db } from "../services/firebase";
 import { doc, getDoc, setDoc } from "firebase/firestore";
 
-// ==============================
-// HOOK LISTA
-// ==============================
 export function useListaFirestore(usuario) {
   const [lista, setLista] = useState(null);
   const [loading, setLoading] = useState(true);
-
+  const listaRef = useRef(null);
   const uid = usuario?.uid;
 
-  // ==============================
-  // CARREGAR LISTA
-  // ==============================
   useEffect(() => {
     let ativo = true;
-
     if (!uid) {
       setLista({
         modo: "planejamento",
@@ -31,18 +20,14 @@ export function useListaFirestore(usuario) {
       setLoading(false);
       return;
     }
-
     const carregar = async () => {
       try {
         const ref = doc(db, "users", uid, "lista", "dados");
         const snap = await getDoc(ref);
-
         if (!ativo) return;
-
         if (snap.exists()) {
           const data = snap.data();
-
-          setLista({
+          const listaCarregada = {
             modo: String(data.modo || "planejamento").toLowerCase(),
             estabelecimento: data.estabelecimento || "",
             tema: data.tema || "claro",
@@ -51,44 +36,43 @@ export function useListaFirestore(usuario) {
               precoUnitario: Number(item.precoUnitario || 0),
               quantidade: Number(item.quantidade || 1),
             })),
-          });
+          };
+          setLista(listaCarregada);
+          listaRef.current = listaCarregada;
         } else {
-          setLista({
+          const listaPadrao = {
             modo: "planejamento",
             estabelecimento: "",
             tema: "claro",
             itens: [],
-          });
+          };
+          setLista(listaPadrao);
+          listaRef.current = listaPadrao;
         }
       } catch (error) {
         console.error(error);
-
         if (!ativo) return;
-
-        setLista({
+        const listaPadrao = {
           modo: "planejamento",
           estabelecimento: "",
           tema: "claro",
           itens: [],
-        });
+        };
+        setLista(listaPadrao);
+        listaRef.current = listaPadrao;
       } finally {
         if (ativo) setLoading(false);
       }
     };
-
     carregar();
-
     return () => {
       ativo = false;
     };
   }, [uid]);
 
-  // ==============================
-  // SALVAR LISTA
-  // ==============================
   useEffect(() => {
     if (!uid || !lista || loading) return;
-
+    if (JSON.stringify(listaRef.current) === JSON.stringify(lista)) return;
     const timeout = setTimeout(async () => {
       try {
         await setDoc(doc(db, "users", uid, "lista", "dados"), {
@@ -97,13 +81,13 @@ export function useListaFirestore(usuario) {
           itens: lista.itens,
           tema: lista.tema || "claro",
         });
+        listaRef.current = lista;
       } catch (error) {
         console.error(error);
       }
     }, 400);
-
     return () => clearTimeout(timeout);
   }, [lista, uid, loading]);
 
   return { lista, setLista, loading };
-          }
+}

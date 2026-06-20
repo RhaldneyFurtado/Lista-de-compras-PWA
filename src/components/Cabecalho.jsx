@@ -1,12 +1,12 @@
 // ==============================
-// IMPORTA ÍCONES
+// IMPORTA ICONES
 // ==============================
 import { ShoppingCart, Trash2, LogOut, User } from "lucide-react";
 
 import VersaoApp from "./VersaoApp";
 
 // ==============================
-// COMPONENTE - CABEÇALHO
+// COMPONENTE - CABECALHO
 // ==============================
 export default function Cabecalho({
   estabelecimento,
@@ -40,7 +40,7 @@ export default function Cabecalho({
             </div>
           </div>
 
-          {/* DIREITA (FORÇADO MAIS PRA BORDA) */}
+          {/* DIREITA */}
           <div className="flex items-center justify-end gap-2 sm:gap-3 sm:ml-auto w-full sm:w-auto">
             {/* TEMA */}
             <button
@@ -54,12 +54,12 @@ export default function Cabecalho({
               {temaSeguro === "escuro" ? "☀️" : "🌙"}
             </button>
 
-            {/* USUÁRIO */}
+            {/* USUARIO */}
             <div className="h-10 w-10 sm:h-12 sm:w-12 flex items-center justify-center overflow-hidden rounded-full border-2 border-white bg-emerald-700">
               {usuario?.photoURL ? (
                 <img
                   src={usuario.photoURL}
-                  alt="Usuário"
+                  alt="Usuario"
                   className="h-full w-full object-cover"
                   referrerPolicy="no-referrer"
                 />

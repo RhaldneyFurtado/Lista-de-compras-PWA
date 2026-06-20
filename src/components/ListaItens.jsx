@@ -35,29 +35,14 @@ export default function ListaItens({
               onToggleComprado={aoAlternarComprado}
             />
           ) : (
-            /* PLANEJAMENTO */
+            /* PLANEJAMENTO - SEM CHECKBOX */
             <div className="rounded-lg border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-4 shadow-sm">
               <div className="flex items-center justify-between gap-3">
                 {/* ESQUERDA */}
                 <div className="flex flex-1 items-center gap-3">
-                  <div className="flex items-center gap-3">
-                    <input
-                      type="checkbox"
-                      checked={item.comprado}
-                      onChange={() => aoAlternarComprado(item.id)}
-                      className="h-5 w-5 accent-emerald-500"
-                    />
-
-                    <p
-                      className={`font-medium ${
-                        item.comprado
-                          ? "text-gray-400 dark:text-gray-500 line-through"
-                          : "text-gray-800 dark:text-gray-100"
-                      }`}
-                    >
-                      {item.nome}
-                    </p>
-                  </div>
+                  <p className="font-medium text-gray-800 dark:text-gray-100">
+                    {item.nome}
+                  </p>
 
                   <div className="ml-6 flex items-center gap-2">
                     <label className="text-sm text-gray-500 dark:text-gray-400">
@@ -70,7 +55,6 @@ export default function ListaItens({
                       value={item.quantidade}
                       onChange={(e) => {
                         const valor = e.target.value;
-                        // Permite apenas números
                         if (valor === "" || /^\d+$/.test(valor)) {
                           aoAtualizar(item.id, {
                             quantidade: valor === "" ? "" : Number(valor),

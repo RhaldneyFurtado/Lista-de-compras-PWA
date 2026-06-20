@@ -1,68 +1,49 @@
-// ==============================
-// HOOK DE AUTENTICAÇÃO GOOGLE
-// ==============================
-
 import { useState, useEffect } from "react";
-import {
-  signInWithPopup,
-  signOut,
-  onAuthStateChanged,
-} from "firebase/auth";
+import { signInWithPopup, signOut, onAuthStateChanged } from "firebase/auth";
 import { doc, setDoc } from "firebase/firestore";
 import { auth, db, googleProvider } from "../services/firebase";
 
-// ==============================
-// HOOK AUTH
-// ==============================
 export function useAuth() {
   const [usuario, setUsuario] = useState(null);
   const [loading, setLoading] = useState(true);
 
   const salvarUsuarioFirestore = async (user) => {
     if (!user) return;
-
     try {
       await setDoc(
         doc(db, "users", user.uid),
         {
-          nome: user.displayName || "Usuário",
+          nome: user.displayName || "Usuario",
           email: user.email || "",
           foto: user.photoURL || "",
           ultimoLogin: new Date().toISOString(),
         },
-        { merge: true }
+        { merge: true },
       );
     } catch (error) {
-      console.error("Erro ao salvar usuário:", error);
+      console.error("Erro ao salvar usuario:", error);
     }
   };
 
   useEffect(() => {
     let ativo = true;
-
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (!ativo) return;
-
       setUsuario(user || null);
-
       const processar = async () => {
         if (!user) {
           setLoading(false);
           return;
         }
-
         try {
           await salvarUsuarioFirestore(user);
         } catch (e) {
           console.error(e);
         }
-
         if (ativo) setLoading(false);
       };
-
       processar();
     });
-
     return () => {
       ativo = false;
       unsubscribe();
@@ -76,7 +57,6 @@ export function useAuth() {
       console.error("Erro login Google:", error);
     }
   };
-
   const sair = async () => {
     try {
       await signOut(auth);
@@ -85,10 +65,5 @@ export function useAuth() {
     }
   };
 
-  return {
-    usuario,
-    loading,
-    entrarComGoogle,
-    sair,
-  };
+  return { usuario, loading, entrarComGoogle, sair };
 }

@@ -9,10 +9,10 @@ import { useListaFirestore } from "./hooks/useListaFirestore";
 import { useHistoricoCompras } from "./hooks/useHistoricoCompras";
 import { useVersionCheck } from "./hooks/useVersionCheck";
 
-import { signOut } from "firebase/auth";
-import { auth, db } from "./services/firebase";
+import { db } from "./services/firebase";
 import { doc, setDoc } from "firebase/firestore";
 
+import Login from "./components/Login";
 import Cabecalho from "./components/Cabecalho";
 import AlternarModo from "./components/AlternarModo";
 import FormAdicionar from "./components/FormAdicionar";
@@ -24,12 +24,12 @@ import Historico from "./components/Historico";
 // APP
 // ==============================
 function App() {
-  // Verificar atualizações de versão
+  // Verificar atualizacoes de versao
   useVersionCheck();
-  const { usuario, loading } = useAuth();
 
-  const { lista, setLista } = useListaFirestore(usuario);
-  const { historico, carregando, deletarCompra } =
+  const { usuario, loading: authLoading, sair } = useAuth();
+  const { lista, setLista, loading: listaLoading } = useListaFirestore(usuario);
+  const { historico, carregando, deletarCompra, adicionarCompraLocal } =
     useHistoricoCompras(usuario);
 
   const [aba, setAba] = useState("compras");
@@ -46,17 +46,14 @@ function App() {
   }, [lista?.tema]);
 
   useEffect(() => {
-    document.documentElement.classList.toggle(
-      "dark",
-      tema === "escuro"
-    );
+    document.documentElement.classList.toggle("dark", tema === "escuro");
   }, [tema]);
 
   // ==============================
   // LOGOUT
   // ==============================
   const fazerLogout = async () => {
-    await signOut(auth);
+    await sair();
   };
 
   // ==============================
@@ -68,11 +65,8 @@ function App() {
     const itensValidos = lista.itens || [];
 
     const total = itensValidos.reduce(
-      (acc, item) =>
-        acc +
-        (item.quantidade || 0) *
-          (item.precoUnitario || 0),
-      0
+      (acc, item) => acc + (item.quantidade || 0) * (item.precoUnitario || 0),
+      0,
     );
 
     const id =
@@ -90,20 +84,17 @@ function App() {
     };
 
     try {
-      await setDoc(
-        doc(db, "users", usuario.uid, "compras", id),
-        compra
-      );
+      await setDoc(doc(db, "users", usuario.uid, "compras", id), compra);
 
-      await setDoc(
-        doc(db, "users", usuario.uid, "lista", "dados"),
-        {
-          modo: "planejamento",
-          estabelecimento: "",
-          tema,
-          itens: [],
-        }
-      );
+      // Adiciona ao historico local para atualizar UI imediatamente
+      adicionarCompraLocal(compra);
+
+      await setDoc(doc(db, "users", usuario.uid, "lista", "dados"), {
+        modo: "planejamento",
+        estabelecimento: "",
+        tema,
+        itens: [],
+      });
 
       setLista({
         modo: "planejamento",
@@ -119,7 +110,7 @@ function App() {
   };
 
   // ==============================
-  // FUNÇÕES LISTA SEGURAS
+  // FUNCOES LISTA SEGURAS
   // ==============================
   const removerItem = (id) => {
     setLista((prev) => {
@@ -139,7 +130,7 @@ function App() {
       return {
         ...prev,
         itens: (prev.itens || []).map((i) =>
-          i.id === id ? { ...i, ...dados } : i
+          i.id === id ? { ...i, ...dados } : i,
         ),
       };
     });
@@ -152,9 +143,7 @@ function App() {
       return {
         ...prev,
         itens: (prev.itens || []).map((i) =>
-          i.id === id
-            ? { ...i, comprado: !i.comprado }
-            : i
+          i.id === id ? { ...i, comprado: !i.comprado } : i,
         ),
       };
     });
@@ -163,7 +152,7 @@ function App() {
   // ==============================
   // LOADING
   // ==============================
-  if (loading) {
+  if (authLoading || listaLoading) {
     return (
       <div className="flex min-h-screen items-center justify-center">
         <p>Carregando...</p>
@@ -171,7 +160,14 @@ function App() {
     );
   }
 
-  if (!usuario || !lista) {
+  // ==============================
+  // LOGIN
+  // ==============================
+  if (!usuario) {
+    return <Login />;
+  }
+
+  if (!lista) {
     return (
       <div className="flex min-h-screen items-center justify-center">
         <p>Carregando lista...</p>
@@ -184,34 +180,26 @@ function App() {
   // ==============================
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-slate-900">
-
       <Cabecalho
         usuario={usuario}
         estabelecimento={lista.estabelecimento || ""}
         aoDefinirEstabelecimento={(valor) =>
           setLista((prev) =>
-            prev
-              ? { ...prev, estabelecimento: valor }
-              : prev
+            prev ? { ...prev, estabelecimento: valor } : prev,
           )
         }
         aoLimpar={() =>
-          setLista((prev) =>
-            prev ? { ...prev, itens: [] } : prev
-          )
+          setLista((prev) => (prev ? { ...prev, itens: [] } : prev))
         }
         aoLogout={fazerLogout}
         tema={tema}
         aoDefinirTema={(valor) => {
           setTema(valor);
-          setLista((prev) =>
-            prev ? { ...prev, tema: valor } : prev
-          );
+          setLista((prev) => (prev ? { ...prev, tema: valor } : prev));
         }}
       />
 
       <main className="mx-auto max-w-4xl space-y-6 px-4 py-6">
-
         {/* ABAS */}
         <div className="flex gap-2">
           <button
@@ -233,7 +221,7 @@ function App() {
                 : "bg-white text-gray-700 dark:bg-slate-800 dark:text-white"
             }`}
           >
-            Histórico
+            Historico
           </button>
         </div>
 
@@ -243,9 +231,7 @@ function App() {
             <AlternarModo
               modo={lista.modo}
               aoAlternar={(modo) =>
-                setLista((prev) =>
-                  prev ? { ...prev, modo } : prev
-                )
+                setLista((prev) => (prev ? { ...prev, modo } : prev))
               }
             />
 
@@ -270,7 +256,7 @@ function App() {
                           },
                         ],
                       }
-                    : prev
+                    : prev,
                 )
               }
             />
@@ -287,15 +273,11 @@ function App() {
               totais={{
                 total: itens.reduce(
                   (acc, item) =>
-                    acc +
-                    (item.quantidade || 0) *
-                      (item.precoUnitario || 0),
-                  0
+                    acc + (item.quantidade || 0) * (item.precoUnitario || 0),
+                  0,
                 ),
                 quantidadeItens: itens.length,
-                itensComprados: itens.filter(
-                  (item) => item.comprado
-                ).length,
+                itensComprados: itens.filter((item) => item.comprado).length,
               }}
             />
 
@@ -310,7 +292,7 @@ function App() {
           </>
         )}
 
-        {/* HISTÓRICO */}
+        {/* HISTORICO */}
         {aba === "historico" && (
           <Historico
             historico={historico}
@@ -318,7 +300,6 @@ function App() {
             deletarCompra={deletarCompra}
           />
         )}
-
       </main>
     </div>
   );
