@@ -4,8 +4,6 @@
 
 import { User } from "lucide-react";
 import { useAuth } from "../hooks/useAuth";
-// Import do logo colorido do Google
-import googleIcon from "../assets/google.svg";
 
 export default function Login() {
   const { usuario, entrarComGoogle, sair } = useAuth();
@@ -49,7 +47,7 @@ export default function Login() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-emerald-500 to-green-700 p-4">
       <div className="w-full max-w-sm rounded-2xl bg-white p-6 text-center shadow-xl">
-        {/* Ícone do carrinho idêntico ao da aba do navegador */}
+        {/* Ícone do carrinho ajustado com BASE_URL para funcionar perfeitamente no GitHub Pages */}
         <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-emerald-100 p-2">
           <img
             src={`${import.meta.env.BASE_URL}pwa-192x192.png`}
@@ -67,7 +65,12 @@ export default function Login() {
           onClick={entrarComGoogle}
           className="mt-6 flex w-full items-center justify-center gap-2 rounded-xl border bg-white py-2 font-medium text-gray-700 shadow transition hover:bg-gray-50"
         >
-          <img src={googleIcon} alt="Google" className="h-5 w-5" />
+          {/* Logo oficial colorida do Google via CDN oficial */}
+          <img
+            src="https://www.svgrepo.com/show/475656/google-color.svg"
+            alt="Google"
+            className="h-5 w-5"
+          />
           Entrar com Google
         </button>
       </div>
