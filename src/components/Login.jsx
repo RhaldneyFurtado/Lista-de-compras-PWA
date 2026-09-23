@@ -47,8 +47,8 @@ export default function Login() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-emerald-500 to-green-700 p-4">
       <div className="w-full max-w-sm rounded-2xl bg-white p-6 text-center shadow-xl">
-        {/* Ícone do carrinho ajustado com BASE_URL para funcionar perfeitamente no GitHub Pages */}
-        <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-emerald-100 p-2">
+        {/* Ícone do carrinho sem fundo/borda verde */}
+        <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center">
           <img
             src={`${import.meta.env.BASE_URL}pwa-192x192.png`}
             alt="Ícone do App"
