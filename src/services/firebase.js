@@ -1,3 +1,7 @@
+// ==============================
+// CONFIGURAÇÃO DO FIREBASE
+// ==============================
+
 import { initializeApp } from "firebase/app";
 import {
   initializeAppCheck,
@@ -11,24 +15,34 @@ import {
 } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 
+// Credenciais dinâmicas carregadas via variáveis de ambiente (.env)
 const firebaseConfig = {
-  apiKey: "AIzaSyBN-jgFWi10Onb0atB7ty24IhfRSMMxulU",
-  authDomain: "lista-de-compras-pwa-64fac.firebaseapp.com",
-  projectId: "lista-de-compras-pwa-64fac",
-  storageBucket: "lista-de-compras-pwa-64fac.appspot.com",
-  messagingSenderId: "922020197463",
-  appId: "1:922020197463:web:41e9aa3c04bf76c7941f12",
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID,
 };
 
+// Log de verificação do carregamento das variáveis no ambiente
 console.log(
   "Firebase API Key carregada:",
   firebaseConfig.apiKey ? "Sim" : "Nao",
 );
 
+// Inicializa a aplicação principal do Firebase
 const app = initializeApp(firebaseConfig);
 
-if (typeof window !== "undefined") {
-  const recaptchaKey = "6LcPX80sAAAAADDR6FC6ZFr_Wb_-bdwCbCD1tnfr";
+// Identificação do ambiente de execução local (localhost ou IP local)
+const isLocalhost =
+  typeof window !== "undefined" &&
+  (window.location.hostname === "localhost" ||
+    window.location.hostname === "127.0.0.1");
+
+// Configuração do App Check para proteção contra abusos (Desativado em ambiente local/preview)
+if (typeof window !== "undefined" && !import.meta.env.DEV && !isLocalhost) {
+  const recaptchaKey = import.meta.env.VITE_RECAPTCHA_SITE_KEY;
   if (recaptchaKey) {
     initializeAppCheck(app, {
       provider: new ReCaptchaEnterpriseProvider(recaptchaKey),
@@ -40,8 +54,13 @@ if (typeof window !== "undefined") {
   }
 }
 
+// Configuração do serviço de Autenticação
 export const auth = getAuth(app);
 setPersistence(auth, browserLocalPersistence);
+
+// Provedor de login via Google
 export const googleProvider = new GoogleAuthProvider();
 googleProvider.setCustomParameters({ prompt: "select_account" });
+
+// Instância do banco de dados Firestore
 export const db = getFirestore(app);
