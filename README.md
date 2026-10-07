@@ -1,25 +1,53 @@
+# Lista de Compras Inteligente (PWA)
 
-Funcionalidades
-Adicionar itens à lista com nome, quantidade e categoria
-Marcar itens como comprados com um clique
-Excluir itens individualmente ou limpar a lista inteira
-Categorização automática para organização visual
-Persistência de dados no localStorage — seus itens ficam salvos mesmo após fechar o navegador
-Funcionamento offline graças ao Service Worker
-Instalável na tela inicial do celular (Android/iOS) como um app nativo
-Design responsivo que se adapta a qualquer tamanho de tela
+Progressive Web Application (PWA) desenvolvida para otimizar o planejamento e a execução de compras, oferecendo sincronização em tempo real, cálculo de custos e controle de listas.
 
-Tecnologias
-HTML5 — Estrutura semântica
-CSS3 — Estilização moderna com variáveis e animações
-JavaScript (Vanilla) — Lógica da aplicação sem dependências externas
-Service Worker — Cache de recursos para funcionamento offline
-Web App Manifest — Permite instalação como app
+---
 
-Como usar
-Acesse a aplicação no navegador
-Adicione itens à sua lista de compras
-Toque em um item para marcá-lo como comprado
-Instale na tela inicial para acesso rápido como um app
+## Acesso à Aplicação
 
-Obs: Foi desenvolvido com Vibe Coding, fiz todos ajustes necessários para 100% de funcionalidade, boas práticas de programação e todo entendimento do código
+A versão de produção está disponível no link:  
+[https://rhaldneyfurtado.github.io/Lista-de-compras-PWA/](https://rhaldneyfurtado.github.io/Lista-de-compras-PWA/)
+
+---
+
+## Funcionalidades Principais
+
+- **Autenticação com Google:** Login integrado utilizando a conta Google através do Firebase Auth.
+- **Sincronização em Tempo Real:** Dados salvos na nuvem via Firestore com otimização de sincronização, garantindo consistência entre dispositivos.
+- **Modos de Operação:** 
+  - *Planejamento:* Organização prévia dos itens necessários.
+  - *Execução:* Acompanhamento em tempo real durante as compras com controle de subtotais.
+- **Gestão de Histórico:** Consulta de compras finalizadas para controle de despesas.
+- **Instalação (PWA):** Suporte para instalação direta em dispositivos móveis e desktops como aplicativo nativo.
+- **Controle de Versão:** Mecanismo integrado de checagem (`version.json`) para gerenciamento de cache e atualizações automáticas de versão.
+
+---
+
+## Tecnologias Utilizadas
+
+O projeto foi construído utilizando a seguinte stack:
+
+- **React / Vite:** Biblioteca para construção de componentes e empacotamento de alta performance.
+- **Tailwind CSS:** Framework utilitário para estilização responsiva.
+- **Firebase (Auth & Firestore):** Backend-as-a-Service para autenticação e banco de dados NoSQL em nuvem.
+- **Vite PWA Plugin (Workbox):** Configuração de Service Workers e manifesto para funcionalidades PWA.
+- **GitHub Pages:** Hospedagem contínua para o ambiente de produção.
+
+---
+
+## Segurança e Arquitetura
+
+- **Isolamento de Dados:** As regras de segurança do Firestore asseguram que cada usuário acesse exclusivamente os seus próprios registros através de validação de UID (`request.auth.uid == userId`).
+- **Persistência de Sessão:** Gerenciamento de sessão local combinado com o fluxo de redirecionamento para compatibilidade em navegadores mobile.
+
+---
+
+## Execução Local
+
+Para clonar e executar o projeto em ambiente de desenvolvimento:
+
+1. Clone o repositório:
+   ```bash
+   git clone [https://github.com/RhaldneyFurtado/Lista-de-compras-PWA.git](https://github.com/RhaldneyFurtado/Lista-de-compras-PWA.git)
+   cd Lista-de-compras-PWA
