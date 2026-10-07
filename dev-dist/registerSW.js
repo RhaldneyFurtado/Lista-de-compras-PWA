@@ -1,1 +1,0 @@
-if('serviceWorker' in navigator) navigator.serviceWorker.register('/Lista-de-compras-PWA/dev-sw.js?dev-sw', { scope: '/Lista-de-compras-PWA/', type: 'classic' })
